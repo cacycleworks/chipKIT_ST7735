@@ -49,9 +49,12 @@ class GFX : public Print {
 #endif
 		void setCursor(int16_t x, int16_t y);
 		int16_t getCursor(boolean x);
+		void blankPrint( char* text, int size, int bgColor );
+		void blankPrint( char* text );
 		void setTextColor(uint16_t c);
 		void setTextColor(uint16_t c, uint16_t bg);
 		void setTextSize(uint8_t s);
+		uint8_t getTextSize(void);
 		void setTextWrap(boolean w);
 
 		int16_t height(void);

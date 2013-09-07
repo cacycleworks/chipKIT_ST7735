@@ -12,7 +12,8 @@ void GFX::constructor(int16_t w, int16_t h) {
   rotation = 0;    
   cursor_y = cursor_x = 0;
   textsize = 1;
-  textcolor = textbgcolor = 0xFFFF;
+  textcolor = 0xFFFF;
+  textbgcolor = 0;
   wrap = true;
 }
 
@@ -202,7 +203,8 @@ void GFX::fillRect(int16_t x, int16_t y, int16_t w, int16_t h,
 
 
 void GFX::fillScreen(uint16_t color) {
-  fillRect(0, 0, _width, _height, color);
+	textbgcolor=color;
+	fillRect(0, 0, _width, _height, color);
 }
 
 // draw a rounded rectangle!
@@ -405,22 +407,42 @@ int16_t GFX::getCursor(boolean x) {
   return cursor_y;
 }
 
+/////////////////////////////////////////////////////////////////////////
+//  blankPrint() does just that. Blanks out this text and then prints in
+//  new text. I got mad doing this manually all over the place just to update a number
+void GFX::blankPrint( char* text, int size, int bgColor ){
+	int x=getCursor(1), y=getCursor(0), length=strlen(text)+2;
+	int width=length*5*size+2, height=8*size; // height assumes single line
+	fillRect(x, y, width, height, bgColor);
+	setTextSize(size);
+	print(text);
+}
+void GFX::blankPrint( char* text ){
+	int length=strlen(text);
+	int width=length*5*textsize+2, height=8*textsize; // height assumes single line
+	fillRect(cursor_x, cursor_y, width, height, textbgcolor);
+	print(text);
+}
+
 
 void GFX::setTextSize(uint8_t s) {
   textsize = (s > 0) ? s : 1;
+}
+uint8_t GFX::getTextSize() {
+  return textsize;
 }
 
 
 void GFX::setTextColor(uint16_t c) {
   textcolor = c;
-  textbgcolor = c; 
+  // textbgcolor = c;
   // for 'transparent' background, we'll set the bg 
   // to the same as fg instead of using a flag
 }
 
- void GFX::setTextColor(uint16_t c, uint16_t b) {
-   textcolor = c;
-   textbgcolor = b; 
+ void GFX::setTextColor(uint16_t fg, uint16_t bg) {
+   textcolor = fg;
+   textbgcolor = bg;
  }
 
 void GFX::setTextWrap(boolean w) {

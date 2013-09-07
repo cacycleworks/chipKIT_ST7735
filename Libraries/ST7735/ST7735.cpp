@@ -1,4 +1,5 @@
-//	ST7735 code to get Adafruit 1.8" TFT shield working with chipKIT Uno32, uC32
+//	ST7735 code to get Adafruit 1.8" TFT shield working with chipKIT uC32
+//	Note was not able to make it work on my Uno32 with SPI, DSPI with or without delays in ST7735.cpp
 //  This port to chipKIT written by Chris Kelley of ca-cycleworks.com  (c) ? Sure, ok same MIT thing, whatever
 //	This code derived from Adafruit_ST7735 library. See bottom of .h file for their full MIT license stuff.
 /////////////////////////////////////////////////////////////////////////
