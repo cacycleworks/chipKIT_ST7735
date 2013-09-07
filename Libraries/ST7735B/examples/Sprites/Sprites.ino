@@ -290,10 +290,10 @@ uint8_t js() {
 	if (jv > 320 && jv < 345) {
 		return 3;
 	}
-	if (jv > 510 && jv < 530) {
+	if (jv > 505 && jv < 530) {
 		return 4;
 	}
-	if (jv > 940 && jv < 960) {
+	if (jv > 920 && jv < 960) {
 		return 5;
 	}
 	return 0;
