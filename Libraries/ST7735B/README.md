@@ -16,6 +16,9 @@ Constructors of the ST7735 are mirrored, so can operate in the same modes as
 the normal ST7735 library, including all functions of that library.  It simply
 inherits ST7735 as a base class.
 
+Colour Management
+-----------------
+
 Palette functions are controlled by the setColor() and loadPalette() functions:
 
     void setColor(uint8_t color, uint16_t rgb);
@@ -30,11 +33,24 @@ be loaded into the palette using these two functions:
     void loadPalette(const uint16_t *p);
     void loadPalette(const uint8_t p[256][3]);
 
+The colour at any point on the screen can be retrieved using:
+
+    uint8_t colorAt(int16_t x, int16_t y);
+
+This is a helper function which returns the 16-bit 565 RGB colour at a specific location
+on the screen.  This includes any sprites which may be present at that location.
+
+Drawing
+-------
+
 A new bitmap drawing routine which uses an array of 8-bit values instead of 16-bit
 values has also been provided.  This doesn't (yet) support transparency, although
 that is merely an oversight and will be added shortly.
 
     void drawIndexed(uint16_t x, uint16_t y, const uint8_t *data, uint16_t w, uint16_t h);
+
+Sprites
+-------
 
 Sprites are calculated at update time.  They are overlaid over the display framebuffer
 and do not affect the contents of the framebuffer in any way.  A constructor function
@@ -54,11 +70,6 @@ present in the sprite.
 This function returns the sprite visible at a specific point on the screen.  Takes into
 account transparency when calculating which sprite is visible.
 
-    uint8_t colorAt(int16_t x, int16_t y);
-
-This is a helper function which returns the 16-bit 565 RGB colour at a specific location
-on the screen.  This includes any sprites which may be present at that location.
-
     void animate(struct sprite *s);
     void animatePingPong(struct sprite *s);
 
@@ -70,6 +81,56 @@ the end, changes direction instead.
 
 This function returns the first sprite found to be colliding with the specified sprite, or
 NULL if no sprite is colliding.
+
+    void removeSprite(struct sprite *s);
+
+Removes a sprite from the internal linked list.  The list closes up around the gap and the
+memory for the sprite is freed.
+
+Sprites can be moved around the screen with the functions:
+
+    void moveTo(struct sprite *s, int16_t x, int16_t y);
+    void moveBy(struct sprite *s, int16_t dx, int16_t dy);
+
+moveTo() places the sprite at a specified location on the screen.   moveBy() moves it from its
+current location to a new one by a specified amount.
+
+The sprite list can be iterated over using the following functions:
+
+    struct sprite *firstSprite();
+    struct sprite *nextSprite();
+
+The first gets the first sprite in the list and should be called first.  The second gets the
+next sprite, or NULL if there are no more sprites.  Can be used in a for loop:
+
+    for (struct sprite *spr = tft.firstSprite(); spr; spr = tft.nextSprite()) {
+        ...
+    }
+
+Sprites also contain a small (8 byte) memory area for storing information about an individual
+sprite.  This can be accessed using:
+
+    int8_t getSprite(struct sprite *s, uint8_t n);
+    void setSprite(struct sprite *s, uint8_t n, int8_t v);
+
+For low-level access to a sprite, the format of the structure is as follows:
+
+    struct sprite {
+        int16_t xpos;           // The X and Y position of the sprite
+        int16_t ypos;
+        uint16_t width;         // The frame width and height
+        uint16_t height;
+        uint8_t transparent;    // The colour used as transparent
+        int8_t frames;          // The number of frames in the sprite
+        int8_t currentframe;    // The currently active frame
+        int8_t animdir;         // Direction the animation is running (for ping pong)
+        int8_t store[8];        // Small data store area
+        const uint8_t *data;    // Pointer to the sprite graphic data
+        struct sprite *next;    // Linked list pointer to the next sprite
+    };
+
+Screen Control
+--------------
 
     void update();
 
@@ -88,4 +149,8 @@ This is a list of the functions that have been overloaded from the base class by
     void drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color);
     void drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color);
     void fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
+
+
+
+
 

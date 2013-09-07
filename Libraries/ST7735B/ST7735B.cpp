@@ -114,6 +114,29 @@ struct sprite * ST7735B::addSprite(const uint8_t *data, uint16_t w, uint16_t h, 
     return s;
 }
 
+void ST7735B::removeSprite(struct sprite *s) {
+    struct sprite *scan;
+    struct sprite *last = NULL;
+
+    if (this->sprites == s) {
+        scan = s;
+        this->sprites = this->sprites->next;
+        free(s);
+        return;
+    }
+
+    for (scan = this->sprites; scan; scan = scan->next) {
+        if (scan == s) {
+            if (last) {
+                last->next = scan->next;
+                free(s);
+                return;
+            }
+        }
+        last = scan;
+    }
+}
+
 struct sprite *ST7735B::spriteAt(int16_t x, int16_t y) {
     struct sprite *scan;
     if (this->sprites == NULL) {
@@ -180,3 +203,38 @@ struct sprite *ST7735B::collidesWith(struct sprite *s) {
     }
     return NULL;
 }
+
+void ST7735B::moveTo(struct sprite *s, int16_t x, int16_t y) {
+    s->xpos = x;
+    s->ypos = y;
+}
+
+void ST7735B::moveBy(struct sprite *s, int16_t dx, int16_t dy) {
+    s->xpos += dx;
+    s->ypos += dy;
+}
+
+struct sprite *ST7735B::firstSprite() {
+    selectedSprite = this->sprites;
+    return selectedSprite;
+}
+
+struct sprite *ST7735B::nextSprite() {
+    if (selectedSprite == NULL) {
+        return NULL;
+    }
+    selectedSprite = selectedSprite->next;
+    return selectedSprite;
+}
+
+int8_t ST7735B::getSprite(struct sprite *s, uint8_t n) {
+    n = n & 0x07;
+    return s->store[n];
+}
+
+void ST7735B::setSprite(struct sprite *s, uint8_t n, int8_t v) {
+    n = n & 0x07;
+    s->store[n] = v;
+}
+
+
