@@ -12,7 +12,8 @@
  #include "WProgram.h"
 #endif
 
-#define swap(a, b) { int16_t t = a; a = b; b = t; }
+#include <algorithm>
+// #define swap(a, b) { int16_t t = a; a = b; b = t; }
 
 class GFX : public Print {
 	public:

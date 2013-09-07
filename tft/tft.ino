@@ -1,12 +1,13 @@
 //	ST7735 code to get Adafruit 1.8" TFT shield working with chipKIT uC32
-//	Note was not able to make it work on my Uno32 with SPI, DSPI with or without delays in ST7735.cpp
 //  This port to chipKIT written by Chris Kelley of ca-cycleworks.com  (c) ? Sure, ok same MIT thing, whatever
 //	This code derived from Adafruit_ST7735 library. See bottom of .h file for their full MIT license stuff.
 ////////////////////////////////////////////////////////////////////////////////
 //  size 1 template:	12345678901234567890123456 <-- if last char is ON 26, \n not req'd; driver inserts it
-static char version[]={"tft.ino v1.03 2013-SEP-04"};
+static char version[]={"tft.ino v1.04 2013-SEP-05"};
 char text[28];
 //  Version 1.03 : 2013-SEP-04 : majenko updated GFX and ST7735 to work with DSPI! :-)
+//  Version 1.04 : 2013-SEP-05 : tweaks to GFX to remove swap() macro and instead
+//					use STL's std::swap() <-- needed for ANY STL libraries to compile.
 ////////////////////////////////////////////////////////////////////////////////
 // Adafruit 1.8TFT w/joystick 160x128 in landscape (128x160)
 //  Adafruit pins on the shield and why. "SPI:" below means part of hardware SPI
