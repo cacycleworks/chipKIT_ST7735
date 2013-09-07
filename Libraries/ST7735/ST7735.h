@@ -1,4 +1,5 @@
 //	ST7735 code to get Adafruit 1.8" TFT shield working with chipKIT uC32
+//	Note was not able to make it work on my Uno32 with SPI, DSPI with or without delays in ST7735.cpp
 //  This port to chipKIT written by Chris Kelley of ca-cycleworks.com  (c) ? Sure, ok same MIT thing, whatever
 //	This code derived from Adafruit_ST7735 library. See bottom of .h file for their full MIT license stuff.
 /////////////////////////////////////////////////////////////////////////
@@ -215,6 +216,8 @@ class ST7735 : public GFX {
 
 	public:
 		ST7735(uint8_t CS, uint8_t RS);
+		ST7735(uint8_t CS, uint8_t RS, DSPI *SPI);
+		ST7735(uint8_t CS, uint8_t RS, uint8_t SDO, uint8_t SCK);
 
 		void     
 			initB(void),                             // for ST7735B displays
@@ -232,7 +235,9 @@ class ST7735 : public GFX {
 		uint16_t 
 			Color565(uint8_t r, uint8_t g, uint8_t b);
 
-	private:
+	protected:
+        DSPI *spi;
+
 		uint8_t  
 			tabcolor;
 
@@ -244,7 +249,7 @@ class ST7735 : public GFX {
 			commandList(uint8_t *addr),
 			commonInit(uint8_t *cmdList);
 
-		uint8_t  _cs, _rs, colstart, rowstart;
+		uint8_t  _cs, _rs, colstart, rowstart, _sdo, _sck;
 };
 
 #endif

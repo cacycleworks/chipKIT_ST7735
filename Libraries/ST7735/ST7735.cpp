@@ -1,10 +1,9 @@
 //	ST7735 code to get Adafruit 1.8" TFT shield working with chipKIT uC32
+//	Note was not able to make it work on my Uno32 with SPI, DSPI with or without delays in ST7735.cpp
 //  This port to chipKIT written by Chris Kelley of ca-cycleworks.com  (c) ? Sure, ok same MIT thing, whatever
 //	This code derived from Adafruit_ST7735 library. See bottom of .h file for their full MIT license stuff.
 ////////////////////////////////////////////////////////////////////////////////
 #include "ST7735.h"
-
-DSPI0 SPI;
 
 inline uint16_t swapcolor(uint16_t x) { 
 	return (x << 11) | (x & 0x07E0) | (x >> 11);
@@ -16,12 +15,38 @@ inline uint16_t swapcolor(uint16_t x) {
 ST7735::ST7735( uint8_t cs, uint8_t rs ) {
 	_cs   = cs;
 	_rs   = rs;
+    spi = new DSPI0();
 	pinMode(_rs, OUTPUT);
 	pinMode(_cs, OUTPUT);
 	digitalWrite(_cs, HIGH);
-	SPI.begin();
-//	SPI.setClockDivider(SPI_CLOCK_DIV2);
-	SPI.setSpeed(20000000);
+	spi->begin();
+	spi->setSpeed(20000000);
+}
+
+// Version of the constructor that allows you to specify the DSPI channel to use
+ST7735::ST7735( uint8_t cs, uint8_t rs, DSPI *SPI ) {
+	_cs   = cs;
+	_rs   = rs;
+    spi = SPI;
+	pinMode(_rs, OUTPUT);
+	pinMode(_cs, OUTPUT);
+	digitalWrite(_cs, HIGH);
+	spi->begin();
+	spi->setSpeed(20000000);
+}
+
+// Software SPI version.  Specify the data and clock pins
+ST7735::ST7735( uint8_t cs, uint8_t rs, uint8_t sdo, uint8_t sck ) {
+	_cs   = cs;
+	_rs   = rs;
+    spi = NULL;
+    _sdo = sdo;
+    _sck = sck;
+	pinMode(_rs, OUTPUT);
+	pinMode(_cs, OUTPUT);
+    pinMode(_sdo, OUTPUT);
+    pinMode(_sck, OUTPUT);
+	digitalWrite(_cs, HIGH);
 }
 
 // Initialization code common to both 'B' and 'R' type displays
@@ -58,13 +83,22 @@ void ST7735::initR(uint8_t options) {
 }
 
 inline void ST7735::spiwrite(uint8_t c) {
-    SPI.setTransferSize(DSPI_8BIT);
-	SPI.transfer( c );
+    if (spi) {
+        spi->setTransferSize(DSPI_8BIT);
+        spi->transfer( c );
+    } else {
+        shiftOut(_sdo, _sck, MSBFIRST, c);
+    }
 }
 
 inline void ST7735::spiwrite16(uint16_t c) {
-    SPI.setTransferSize(DSPI_16BIT);
-	SPI.transfer( c );
+    if (spi) {
+        spi->setTransferSize(DSPI_16BIT);
+        spi->transfer( c );
+    } else {
+        shiftOut(_sdo, _sck, MSBFIRST, c >> 8);
+        shiftOut(_sdo, _sck, MSBFIRST, c & 0xFF);
+    }
 }
 
 //	These two appear to be wrappers for writing SPI data, however most functions do it themselves
