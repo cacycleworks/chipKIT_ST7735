@@ -10,10 +10,10 @@
 
 #define ADA_SCLK	13
 #define ADA_MOSI	11
-#define ADA_CS		IO11
-#define ADA_DC		IO12
+#define ADA_CS		10
+#define ADA_DC		8
 
-DSPI1 spi;
+DSPI0 spi;
 ST7735B tft = ST7735B(ADA_CS, ADA_DC, &spi);
 
 void setup() {
