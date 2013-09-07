@@ -7,6 +7,9 @@ Much credit to Majenko for amazing chipKIT-specific improvements as well as actu
 new work in what this this particular 1.8" ST7735 TFT capabilities are! :D 
 **Thanks Majenko!**
 
+#### Includes game and kittehs demos
+Be sure to check out the ST7735B "Buffered" examples! Fantastic demonstration of what this hardware can do. ST7735 is a more utilitarian text only demo more along the lines of a simple UI on an embedded device.
+
 #### Install
 1. Click the "Download Zip" button (usually at bottom of right column on Github project page).
 2. Copy or move the `chipKIT_ST7735-master.zip` file to your mpide folder (normally Documents\mpide).
