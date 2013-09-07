@@ -1,16 +1,6 @@
-//	ST7735 code to get Adafruit 1.8" TFT shield working with chipKIT uC32
-//	Note was not able to make it work on my Uno32 with SPI, DSPI with or without delays in ST7735.cpp//  This port to chipKIT written by Chris Kelley of ca-cycleworks.com  (c) ? Sure, ok same MIT thing, whatever
-//	This code derived from Adafruit_ST7735 library. See bottom of .h file for their full MIT license stuff.
+//	Demonstration code for Adafruit 1.8" TFT shield and ST7735 class
 ////////////////////////////////////////////////////////////////////////////////
-//  size 1 template:	12345678901234567890123456 <-- if last char is ON 26, \n not req'd; driver inserts it
-static char version[]={"TFTDemo.ino v1.05 2013-SEP-06"};
-char text[28];
-//  Version 1.03 : 2013-SEP-04 : majenko updated GFX and ST7735 to work with DSPI! :-)
-//  Version 1.04 : 2013-SEP-05 : tweaks to GFX to remove swap() macro and instead
-//					use STL's std::swap() <-- needed for ANY STL libraries to compile.
-//  Version 1.05 : 2013-SEP-06 : Software SPI implemented by majenko using shiftOut(); also created 8- and 16-bit versions of SPI write
-////////////////////////////////////////////////////////////////////////////////
-// Adafruit 1.8TFT w/joystick 160x128 in landscape (128x160)
+// Adafruit 1.8TFT w/joystick 160x128 in landscape (128x160, portrait)
 //  Adafruit pins on the shield and why. "SPI:" below means part of hardware SPI
 //  13 - SPI:SCLK, serial data clock shared between TFT and SD Card             Mega:52
 //  12 - SPI:MISO, data sent from shield to controller (SD Card)                Mega:50
@@ -54,11 +44,16 @@ const char* Buttons[]={"Neutral", "Press", "Up", "Down", "Right", "Left" };
 enum COLORS { 	BLACK = 0x0000, BLUE = 0x001F, RED = 0xF800, ORANGE = 0xFA60, GREEN = 0x07E0,
 				CYAN = 0x07FF, MAGENTA = 0xF81F, YELLOW = 0xFFE0, GRAY = 0xCCCC, WHITE = 0xFFFF
 			};
-
 //	char() values for some special characters defined in GFX.h static font[]
 //  not sure what to call solid triangle arrow things, so "pyramids" = pyr  ??
 enum arrows { uarr = 0x18, darr = 0x19, larr = 0x1b, rarr = 0x1a, upyr = 0x1e, dpyr = 0x1f, lpyr = 0x11, rpyr = 0x10 };
 
+////////////////////////////////////////////////////////////////////////////////
+//  size 1 template:	12345678901234567890123456 <-- if last char is ON 26, \n not req'd; driver inserts it
+static char version[]={"TFTDemo.ino 2013-SEP-07"};
+char text[64];  // Made buffer big enough to hold two lines of text
+
+char 	animations[4][4];   // used for fun, timerbased animation
 ////////////////////////////////////////////////////////////////////////////////
 void setup(){
 	//  Setup the Adafruit 1.8" TFT
@@ -69,42 +64,48 @@ void setup(){
 	//  size 1 template:	12345678901234567890123456 <-- if last char is ON 26, \n not req'd; driver inserts it
 	tft.setTextSize(1); //  1 = 5x8, 2 = 10x16; chars leave blank pixel on bottom
 	cls();
+
+	//  set up animation loop
+	sprintf( animations[0], "%c  ", rarr );
+	sprintf( animations[1], "-%c ", rarr );
+	sprintf( animations[2], "--%c", rarr );
+	sprintf( animations[3], "   ", rarr );
+
 	tft.setCursor(0, 20);
-	sprintf(text,"Play with joystick --%c", rarr);
-	tft.print(text);
-	//  Is this required by law? Who needs Serial when you've got a TFT
-	Serial.begin(9600);
+	tft.print("Play with joystick");
+	animationStart();
 }
+
 ////////////////////////////////////////////////////////////////////////////////
 //  clearscreen helper for tft
 void cls() {
 	tft.fillScreen(BLACK);
 	tft.setCursor(0, 2);
 }
+
 ////////////////////////////////////////////////////////////////////////////////
 void loop() {
 	if( doMenu() ){
-		//  something happened with joystick, do we care?
-	} else {
-	}
-		//	footer for the screen
-		//	normally lives in the else{} above but then you don't see A3 change & that's no fun
-		tft.setTextColor(GREEN);
-		tft.setCursor(0,105);
-		tft.print(  "A0   A1   A2   A3\n");
-		sprintf(text,"%-4d %-4d %-4d %-4d\n"
-			,analogRead(A0)
-			,analogRead(A1)
-			,analogRead(A2)
-			,analogRead(A3)
-		);
-		tft.print(text);
+		//  something happened with joystick, an update() action could be called here
+	} 
+	//	footer for the screen; could live in else{} but then you won't see A3 change while pushing button
+	tft.setTextColor(GREEN);
+	tft.setCursor(0,105);
+	//  joystick's ADC value is on A3, others added to help give example for displaying data
+	tft.print(     "A0   A1   A2   A3\n");
+	sprintf(text,"%-4d %-4d %-4d %-4d\n"
+		,analogRead(A0)
+		,analogRead(A1)
+		,analogRead(A2)
+		,analogRead(A3)
+	);
+	tft.print(text);
 
-		tft.setTextColor(GRAY);
-		sprintf(text,"%s\n", version);
-		tft.print(text);
+	tft.setTextColor(GRAY);
+	sprintf(text,"%s\n", version);
+	tft.print(text);
 
-		tft.setTextColor(RED);
+	tft.setTextColor(RED);
 }
 ////////////////////////////////////////////////////////////////////////////////
 //  note: button is handled in order of Neutral( or none ),
@@ -138,6 +139,8 @@ bool doMenu( void ){
 		tft.print(text);
 		delay(1500);
 		cls();
+		tft.setCursor(0, 20);
+		tft.print("Play with joystick");
 	}
 	return true;    //  user input happened
 }
@@ -154,4 +157,27 @@ byte checkJoystick() {
 	if (joystickState < 550) return Left;	// for rotation(3) Right;	//  left, reads 511
 	if (joystickState < 950) return Down;	// for rotation(3) Up;		//  down, reads 931
 	return Neutral;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//  fun text animation exmaple using chipKIT's task manager
+char 	animationFrame;
+int     animationX,animationY,AnimationTaskID;
+unsigned long animationVar;
+void animationTask(int id, void * tptr) {
+	//  store where cursor currently is
+	int _x = tft.getCursor( 1 );
+	int _y = tft.getCursor( 0 );
+	//  set cursor to the location of our animation and print the frame
+	tft.setCursor(animationX,animationY);
+	tft.print(animations[animationFrame++]);
+	//  put cursor back
+	tft.setCursor(_x,_y);
+	//  make sure animationFrame stays 0~3 !
+	animationFrame%=4;
+}
+void animationStart(){  // use destroyTask(int id) to stop
+	animationX = tft.getCursor( 1 );
+	animationY = tft.getCursor( 0 );        //  250 milliseconds, 1/4 second
+    AnimationTaskID = createTask(animationTask, 250, TASK_ENABLE, &animationVar);
 }
