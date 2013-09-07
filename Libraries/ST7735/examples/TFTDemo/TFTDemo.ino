@@ -3,7 +3,7 @@
 //	This code derived from Adafruit_ST7735 library. See bottom of .h file for their full MIT license stuff.
 ////////////////////////////////////////////////////////////////////////////////
 //  size 1 template:	12345678901234567890123456 <-- if last char is ON 26, \n not req'd; driver inserts it
-static char version[]={"tft.ino v1.05 2013-SEP-06"};
+static char version[]={"TFTDemo.ino v1.05 2013-SEP-06"};
 char text[28];
 //  Version 1.03 : 2013-SEP-04 : majenko updated GFX and ST7735 to work with DSPI! :-)
 //  Version 1.04 : 2013-SEP-05 : tweaks to GFX to remove swap() macro and instead
