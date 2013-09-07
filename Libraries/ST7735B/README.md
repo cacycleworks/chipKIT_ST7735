@@ -10,6 +10,7 @@ Relies on DSPI, GFX and ST7735:
     #include <DSPI.h>
     #include <GFX.h>
     #include <ST7735.h>
+    #include <ST7735B.h>
 
 Constructors of the ST7735 are mirrored, so can operate in the same modes as
 the normal ST7735 library, including all functions of that library.  It simply
