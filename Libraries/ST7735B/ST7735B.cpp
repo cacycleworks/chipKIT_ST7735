@@ -92,6 +92,18 @@ void ST7735B::drawIndexed(uint16_t x, uint16_t y, const uint8_t *data, uint16_t 
     }
 }
 
+void ST7735B::drawIndexed(uint16_t x, uint16_t y, const uint8_t *data, uint16_t w, uint16_t h, uint8_t t) {
+    uint32_t pos;
+    for (int j = 0; j < h; j++) {
+        for (int i = 0; i < w; i++) {
+            pos = j * w + i;
+            if (data[pos] != t) {
+                drawPixel(x + i, y + j, data[pos]);
+            }
+        }
+    }
+}
+
 struct sprite * ST7735B::addSprite(const uint8_t *data, uint16_t w, uint16_t h, uint8_t t, uint8_t f) {
     struct sprite *scan;
     struct sprite *s = (struct sprite *)malloc(sizeof(struct sprite));

@@ -43,6 +43,7 @@ class ST7735B : public ST7735 {
         void loadPalette(const uint16_t *p);
         void loadPalette(const uint8_t p[256][3]);
         void drawIndexed(uint16_t x, uint16_t y, const uint8_t *data, uint16_t w, uint16_t h);
+        void drawIndexed(uint16_t x, uint16_t y, const uint8_t *data, uint16_t w, uint16_t h, uint8_t t);
 
         struct sprite * addSprite(const uint8_t *data, uint16_t w, uint16_t h, uint8_t t, uint8_t f);
         void removeSprite(struct sprite *s);
