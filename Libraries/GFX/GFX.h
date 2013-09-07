@@ -1,6 +1,7 @@
 //	GFX code to get Adafruit 1.8" TFT shield working with chipKIT uc32 and UNO32
 //	This code derived from Adafruit_GFX library. See bottom of .h file for their license stuff.
 //  This port to chipKIT written by Chris Kelley of ca-cycleworks.com  (c) ? Sure, ok same license thing, whatever
+////////////////////////////////////////////////////////////////////////////////
 #ifndef _GFX_H
 #define _GFX_H
 
@@ -42,6 +43,8 @@ class GFX : public Print {
 
 		void drawBitmap(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color);
 		void drawChar(int16_t x, int16_t y, unsigned char c, uint16_t color, uint16_t bg, uint8_t size);
+        void drawRGB(int16_t x, int16_t y, const uint16_t *bitmap, int16_t w, int16_t h);
+        void drawRGBA(int16_t x, int16_t y, const uint16_t *bitmap, int16_t w, int16_t h, uint16_t trans);
 #if ARDUINO >= 100
 		virtual size_t write(uint8_t);
 #else
@@ -49,10 +52,9 @@ class GFX : public Print {
 #endif
 		void setCursor(int16_t x, int16_t y);
 		int16_t getCursor(boolean x);
-		void blankPrint( char* text, int size, int bgColor );
-		void blankPrint( char* text );
 		void setTextColor(uint16_t c);
 		void setTextColor(uint16_t c, uint16_t bg);
+		void invertTextColor( );
 		void setTextSize(uint8_t s);
 		uint8_t getTextSize(void);
 		void setTextWrap(boolean w);
@@ -73,7 +75,6 @@ class GFX : public Print {
 		boolean  wrap; // If set, 'wrap' text at right edge of display
 };
 
-//	NOTE: removing from PROGMEM makes this a Mega-only endeavour
 static uint8_t font[] = {
     0x00, 0x00, 0x00, 0x00, 0x00,
 	0x3E, 0x5B, 0x4F, 0x5B, 0x3E,

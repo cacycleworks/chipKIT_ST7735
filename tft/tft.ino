@@ -1,10 +1,12 @@
-//	ST7735 code to get Adafruit 1.8" TFT shield working with chipKIT Uno32, uC32
+//	ST7735 code to get Adafruit 1.8" TFT shield working with chipKIT uC32
+//	Note was not able to make it work on my Uno32 with SPI, DSPI with or without delays in ST7735.cpp
 //  This port to chipKIT written by Chris Kelley of ca-cycleworks.com  (c) ? Sure, ok same MIT thing, whatever
 //	This code derived from Adafruit_ST7735 library. See bottom of .h file for their full MIT license stuff.
 ////////////////////////////////////////////////////////////////////////////////
 //  size 1 template:	12345678901234567890123456 <-- if last char is ON 26, \n not req'd; driver inserts it
-static char version[]={"tft.ino v1.02 2013-SEP-03"};
+static char version[]={"tft.ino v1.03 2013-SEP-04"};
 char text[28];
+//  Version 1.03 : 2013-SEP-04 : majenko updated GFX and ST7735 to work with DSPI! :-)
 ////////////////////////////////////////////////////////////////////////////////
 // Adafruit 1.8TFT w/joystick 160x128 in landscape (128x160)
 //  Adafruit pins on the shield and why. "SPI:" below means part of hardware SPI
@@ -15,7 +17,7 @@ char text[28];
 //   8 - DC or RS for TFT, "data channel" or "register select", a low on this pin tells the TFT it is about to receive a command, while high means data is incoming
 //   4 - SPI SS for SD Card
 //  A3 - Analog input for the joystick; each of 5 inputs are in a resistor network
-#include <SPI.h>
+#include <DSPI.h>
 #include "GFX.h"
 #include "ST7735.h"
 //  UNO hardware SPI pins
@@ -63,11 +65,12 @@ void setup(){
 	tft.initR( INITR_BLACKTAB );    //  tab color very important, there's RED and GREEN, too.
 	tft.setRotation(1);
 	tft.setTextColor(RED);
-	tft.setCursor(0, 10);
 	//  size 2 template:	1234567890123 <-- if last char is ON 13, \n not req'd; driver inserts it
 	//  size 1 template:	12345678901234567890123456 <-- if last char is ON 26, \n not req'd; driver inserts it
 	tft.setTextSize(1); //  1 = 5x8, 2 = 10x16; chars leave blank pixel on bottom
 	cls();
+	tft.setCursor(0, 20);
+	tft.print("Play with joystick -->");
 	//  Is this required by law? Who needs Serial when you've got a TFT
 	Serial.begin(9600);
 }

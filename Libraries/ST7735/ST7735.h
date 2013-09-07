@@ -3,11 +3,12 @@
 //  This port to chipKIT written by Chris Kelley of ca-cycleworks.com  (c) ? Sure, ok same MIT thing, whatever
 //	This code derived from Adafruit_ST7735 library. See bottom of .h file for their full MIT license stuff.
 /////////////////////////////////////////////////////////////////////////
+//  v1.03   majenko made DSPI work, set to 20Mbps, & colour data is transferred as single 16-bit word transactions instead of 2 8-bit transactions
 #ifndef _ST7735H_
 #define _ST7735H_
 
 #include "WProgram.h"
-#include <SPI.h>
+#include <DSPI.h>
 #include <GFX.h>
 
 // some flags for initR() :(
@@ -239,10 +240,10 @@ class ST7735 : public GFX {
 
 		void     
 			spiwrite(uint8_t),
+			spiwrite16(uint16_t),
 			writecommand(uint8_t c),
 			writedata(uint8_t d),
 			commandList(uint8_t *addr),
-			Delay10us(),
 			commonInit(uint8_t *cmdList);
 
 		uint8_t  _cs, _rs, colstart, rowstart;

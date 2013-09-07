@@ -2,8 +2,11 @@
 //	Note was not able to make it work on my Uno32 with SPI, DSPI with or without delays in ST7735.cpp
 //  This port to chipKIT written by Chris Kelley of ca-cycleworks.com  (c) ? Sure, ok same MIT thing, whatever
 //	This code derived from Adafruit_ST7735 library. See bottom of .h file for their full MIT license stuff.
-/////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//  v1.03   majenko made DSPI work, set to 20Mbps, & colour data is transferred as single 16-bit word transactions instead of 2 8-bit transactions
 #include "ST7735.h"
+
+DSPI0 SPI;
 
 inline uint16_t swapcolor(uint16_t x) { 
 	return (x << 11) | (x & 0x07E0) | (x >> 11);
@@ -19,7 +22,8 @@ ST7735::ST7735( uint8_t cs, uint8_t rs ) {
 	pinMode(_cs, OUTPUT);
 	digitalWrite(_cs, HIGH);
 	SPI.begin();
-	SPI.setClockDivider(SPI_CLOCK_DIV2);
+//	SPI.setClockDivider(SPI_CLOCK_DIV2);
+	SPI.setSpeed(20000000);
 }
 
 // Initialization code common to both 'B' and 'R' type displays
@@ -29,7 +33,7 @@ void ST7735::commonInit(uint8_t *cmdList) {
 	colstart  = rowstart = 0; // May be overridden in init func
 
 	digitalWrite(_cs, LOW);
-	delay(10);
+	//delay(10);
 	if(cmdList) commandList(cmdList);
 	digitalWrite(_cs, HIGH);
 }
@@ -56,7 +60,12 @@ void ST7735::initR(uint8_t options) {
 }
 
 inline void ST7735::spiwrite(uint8_t c) {
-//	Delay10us();    // not needed and makes TFT only slightly faster than software SPI on Arduinos
+    SPI.setTransferSize(DSPI_8BIT);
+	SPI.transfer( c );
+}
+
+inline void ST7735::spiwrite16(uint16_t c) {
+    SPI.setTransferSize(DSPI_16BIT);
 	SPI.transfer( c );
 }
 
@@ -128,8 +137,7 @@ void ST7735::pushColor(uint16_t color) {
 	digitalWrite(_rs, HIGH);
 	digitalWrite(_cs, LOW);
 
-	spiwrite(color >> 8);
-	spiwrite(color);
+	spiwrite16(color);
 
 	digitalWrite(_cs, HIGH);
 }
@@ -144,8 +152,7 @@ void ST7735::drawPixel(int16_t x, int16_t y, uint16_t color) {
 
 	if (tabcolor == INITR_BLACKTAB)   color = swapcolor(color);
 
-	spiwrite(color >> 8);
-	spiwrite(color);
+	spiwrite16(color);
 
 	digitalWrite(_cs, HIGH);
 }
@@ -164,8 +171,7 @@ void ST7735::drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color) {
 	digitalWrite(_rs, HIGH);
 	digitalWrite(_cs, LOW);
 	while (h--) {
-		spiwrite(hi);
-		spiwrite(lo);
+		spiwrite16(color);
 	}
 	digitalWrite(_cs, HIGH);
 }
@@ -185,8 +191,7 @@ void ST7735::drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color) {
 	digitalWrite(_rs, HIGH);
 	digitalWrite(_cs, LOW);
 	while (w--) {
-		spiwrite(hi);
-		spiwrite(lo);
+		spiwrite16(color);
 	}
 	digitalWrite(_cs, HIGH);
 }
@@ -213,8 +218,7 @@ void ST7735::fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color
 	digitalWrite(_cs, LOW);
 	for(y=h; y>0; y--) {
 		for(x=w; x>0; x--) {
-			spiwrite(hi);
-			spiwrite(lo);
+			spiwrite16(color);
 		}
 	}
 	digitalWrite(_cs, HIGH);
@@ -262,11 +266,4 @@ void ST7735::setRotation(uint8_t m) {
 
 void ST7735::invertDisplay(boolean i) {
 	writecommand(i ? ST7735_INVON : ST7735_INVOFF);
-}
-
-void ST7735::Delay10us()   {
-	volatile int cnt;
-	for (cnt = 0; cnt < 100; cnt++) {
-		;
-	}
 }

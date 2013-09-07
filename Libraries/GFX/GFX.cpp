@@ -1,9 +1,8 @@
 //	GFX code to get Adafruit 1.8" TFT shield working with chipKIT uc32 and UNO32
 //	This code derived from Adafruit_GFX library. See bottom of .h file for their license stuff.
 //  This port to chipKIT written by Chris Kelley of ca-cycleworks.com  (c) ? Sure, ok same license thing, whatever
+////////////////////////////////////////////////////////////////////////////////
 #include "GFX.h"
-//#include "glcdfont.c"	<--- moved into GFX.h to compile
-//#include <avr/pgmspace.h>	<-- DIE
 
 void GFX::constructor(int16_t w, int16_t h) {
   _width = WIDTH = w;
@@ -335,6 +334,27 @@ void GFX::drawBitmap(int16_t x, int16_t y,
   }
 }
 
+void GFX::drawRGB(int16_t x, int16_t y, const uint16_t *bitmap, int16_t w, int16_t h) {
+    int16_t i, j;
+    for (j = 0; j < h; j++) {
+        for (i = 0; i < w; i++) {
+            drawPixel(x+i, y+j, bitmap[j * w + i]);
+        }
+    }
+}
+
+void GFX::drawRGBA(int16_t x, int16_t y, const uint16_t *bitmap, int16_t w, int16_t h, uint16_t trans) {
+    int16_t i, j;
+    uint16_t col;
+    for (j = 0; j < h; j++) {
+        for (i = 0; i < w; i++) {
+            col = bitmap[j * w + i];
+            if (col != trans) {
+                drawPixel(x+i, y+j, col);
+            }
+        }
+    }
+}
 
 #if ARDUINO >= 100
 size_t GFX::write(uint8_t c) {
@@ -406,25 +426,6 @@ int16_t GFX::getCursor(boolean x) {
     return cursor_x;
   return cursor_y;
 }
-
-/////////////////////////////////////////////////////////////////////////
-//  blankPrint() does just that. Blanks out this text and then prints in
-//  new text. I got mad doing this manually all over the place just to update a number
-void GFX::blankPrint( char* text, int size, int bgColor ){
-	int x=getCursor(1), y=getCursor(0), length=strlen(text)+2;
-	int width=length*5*size+2, height=8*size; // height assumes single line
-	fillRect(x, y, width, height, bgColor);
-	setTextSize(size);
-	print(text);
-}
-void GFX::blankPrint( char* text ){
-	int length=strlen(text);
-	int width=length*5*textsize+2, height=8*textsize; // height assumes single line
-	fillRect(cursor_x, cursor_y, width, height, textbgcolor);
-	print(text);
-}
-
-
 void GFX::setTextSize(uint8_t s) {
   textsize = (s > 0) ? s : 1;
 }
@@ -435,15 +436,16 @@ uint8_t GFX::getTextSize() {
 
 void GFX::setTextColor(uint16_t c) {
   textcolor = c;
-  // textbgcolor = c;
-  // for 'transparent' background, we'll set the bg 
-  // to the same as fg instead of using a flag
 }
 
- void GFX::setTextColor(uint16_t fg, uint16_t bg) {
+void GFX::setTextColor(uint16_t fg, uint16_t bg) {
    textcolor = fg;
    textbgcolor = bg;
- }
+}
+
+void GFX::invertTextColor( ){
+	setTextColor( textbgcolor, textcolor );
+}
 
 void GFX::setTextWrap(boolean w) {
   wrap = w;
