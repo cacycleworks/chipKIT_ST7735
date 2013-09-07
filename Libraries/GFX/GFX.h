@@ -1,18 +1,6 @@
-/******************************************************************
- This is the core graphics library for all our displays, providing
- basic graphics primitives (points, lines, circles, etc.). It needs
- to be paired with a hardware-specific library for each display
- device we carry (handling the lower-level functions).
- 
- Adafruit invests time and resources providing this open
- source code, please support Adafruit and open-source hardware
- by purchasing products from Adafruit!
- 
- Written by Limor Fried/Ladyada for Adafruit Industries.
- BSD license, check license.txt for more information.
- All text above must be included in any redistribution.
- ******************************************************************/
-
+//	GFX code to get Adafruit 1.8" TFT shield working with chipKIT uc32 and UNO32
+//	This code derived from Adafruit_GFX library. See bottom of .h file for their license stuff.
+//  This port to chipKIT written by Chris Kelley of ca-cycleworks.com  (c) ? Sure, ok same license thing, whatever
 #ifndef _GFX_H
 #define _GFX_H
 
@@ -343,3 +331,61 @@ static uint8_t font[] = {
 
 
 #endif
+/******************************************************************
+ This is the core graphics library for all our displays, providing
+ basic graphics primitives (points, lines, circles, etc.). It needs
+ to be paired with a hardware-specific library for each display
+ device we carry (handling the lower-level functions).
+
+ Adafruit invests time and resources providing this open
+ source code, please support Adafruit and open-source hardware
+ by purchasing products from Adafruit!
+
+ Written by Limor Fried/Ladyada for Adafruit Industries.
+ BSD license, check license.txt for more information.
+ All text above must be included in any redistribution.
+ ******************************************************************/
+
+/******************************************************************
+README.txt
+This is the core graphics library for all our displays, providing basic graphics primitives (points, lines, circles, etc.). It needs to be paired with a hardware-specific library for each display device we carry (handling the lower-level functions).
+
+Adafruit invests time and resources providing this open source code, please support Adafruit and open-source hardware by purchasing products from Adafruit!
+
+Written by Limor Fried/Ladyada for Adafruit Industries.
+BSD license, check license.txt for more information.
+All text above must be included in any redistribution.
+
+To download, click the DOWNLOAD ZIP button, uncompress and rename the uncompressed folder Adafruit_GFX. Confirm that the Adafruit_GFX folder contains Adafruit_GFX.cpp and Adafruit_GFX.h
+
+Place the Adafruit_GFX library folder your <arduinosketchfolder>/Libraries/ folder. You may need to create the Libraries subfolder if its your first library. Restart the IDE.
+ ******************************************************************/
+
+/******************************************************************
+license.txt
+Software License Agreement (BSD License)
+
+Copyright (c) 2012, Adafruit Industries.  All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+1. Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution.
+3. Neither the name of the copyright holders nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ''AS IS'' AND ANY
+EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ ******************************************************************/

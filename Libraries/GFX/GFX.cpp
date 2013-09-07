@@ -1,18 +1,6 @@
-/******************************************************************
- This is the core graphics library for all our displays, providing
- basic graphics primitives (points, lines, circles, etc.). It needs
- to be paired with a hardware-specific library for each display
- device we carry (handling the lower-level functions).
- 
- Adafruit invests time and resources providing this open
- source code, please support Adafruit and open-source hardware
- by purchasing products from Adafruit!
- 
- Written by Limor Fried/Ladyada for Adafruit Industries.
- BSD license, check license.txt for more information.
- All text above must be included in any redistribution.
- ******************************************************************/
-
+//	GFX code to get Adafruit 1.8" TFT shield working with chipKIT uc32 and UNO32
+//	This code derived from Adafruit_GFX library. See bottom of .h file for their license stuff.
+//  This port to chipKIT written by Chris Kelley of ca-cycleworks.com  (c) ? Sure, ok same license thing, whatever
 #include "GFX.h"
 //#include "glcdfont.c"	<--- moved into GFX.h to compile
 //#include <avr/pgmspace.h>	<-- DIE

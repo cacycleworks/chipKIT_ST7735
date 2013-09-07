@@ -1,14 +1,17 @@
-//	ST7735 code (still Arduino capable)
-//	This code derived from Adafruit_ST7735 library. See bottom of .h file for their full MIT license stuff
-
+//	ST7735 code to get Adafruit 1.8" TFT shield working with chipKIT uC32
+//	Note was not able to make it work on my Uno32 with SPI, DSPI with or without delays in ST7735.cpp
+//  This port to chipKIT written by Chris Kelley of ca-cycleworks.com  (c) ? Sure, ok same MIT thing, whatever
+//	This code derived from Adafruit_ST7735 library. See bottom of .h file for their full MIT license stuff.
+/////////////////////////////////////////////////////////////////////////
 #include "ST7735.h"
 
 inline uint16_t swapcolor(uint16_t x) { 
 	return (x << 11) | (x & 0x07E0) | (x >> 11);
 }
 
-// Constructor for using hardware SPI.  Faster, but must use SPI pins
-// specific to each board type (e.g. 11,13 for Uno, 51,52 for Mega, etc.)
+//	Constructor for using hardware SPI.  Faster, but must use SPI pins
+//	specific to each board type (e.g. 11,13 for Uno, 51,52 for Mega, etc.)
+//  RST pin ignored altogether
 ST7735::ST7735( uint8_t cs, uint8_t rs ) {
 	_cs   = cs;
 	_rs   = rs;
@@ -30,12 +33,14 @@ void ST7735::commonInit(uint8_t *cmdList) {
 	if(cmdList) commandList(cmdList);
 	digitalWrite(_cs, HIGH);
 }
-
-// Initialization for ST7735B screens
+//	Initialization for ST7735B screens - seems to be no reference to this in code?
+//  Legacy?
 void ST7735::initB(void) {
 	commonInit(Bcmd);
 }
-// Initialization for ST7735R screens (green or red tabs)
+//	Initialization for ST7735R screens (green or red tabs) Black tabs don't have
+//  anything special in here, however affects some of the color and bit handling in
+//  other functions
 void ST7735::initR(uint8_t options) {
 	commonInit(Rcmd1);
 	if(options == INITR_GREENTAB) {
@@ -91,8 +96,11 @@ void ST7735::commandList(uint8_t *addr) {
 		}
 		if(ms) {
 			ms = *addr;addr++; // Read post-command delay time (ms)
+			//  Tested without this delay and TFT inits without it. Command list
+			//  byte array was NOT altered, thus the above line of code required
+			//  to step the pointer to the next array element.
 //			if(ms == 255) ms = 500;     // If 255, delay for 500 ms
-			delay(ms);
+//			delay(ms);
 		}
 	}
 }
