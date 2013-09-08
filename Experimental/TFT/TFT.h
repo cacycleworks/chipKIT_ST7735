@@ -76,8 +76,6 @@ class TFT : public Print
 
 };
 
-#include <Framebuffer.h>
-
 // Supplorted communication systems
 #include <TFTDSPI.h>
 #include <TFTSoftSPI.h>
