@@ -30,6 +30,20 @@ char text[40];
 // analog pin 3 for button input
 #define ADA_JOYSTICK A3
 
+#define GLCD_DI 8
+#define GLCD_CLK 9
+#define GLCD_CS1 10
+#define GLCD_CS2 11
+
+#define GLCD_D0 34
+#define GLCD_D1 35
+#define GLCD_D2 36
+#define GLCD_D3 37
+#define GLCD_D4 38
+#define GLCD_D5 39
+#define GLCD_D6 40
+#define GLCD_D7 41
+
 //	SD card chip select digital pin 4 : No work yet for SD Card
 //	#define SD_CS 4
 
@@ -45,12 +59,16 @@ TFTDSPI mySpi(&spi, ADA_CS, ADA_DC);
 // Software SPI
 //TFTSoftSPI mySpi(ADA_MOSI, ADA_SCLK, ADA_CS, ADA_DC);
 
+//TFTPar8 chip1(GLCD_CS1, GLCD_DI, GLCD_CLK, GLCD_D0, GLCD_D1, GLCD_D2, GLCD_D3, GLCD_D4, GLCD_D5, GLCD_D6, GLCD_D7);
+//TFTPar8 chip2(GLCD_CS2, GLCD_DI, GLCD_CLK, GLCD_D0, GLCD_D1, GLCD_D2, GLCD_D3, GLCD_D4, GLCD_D5, GLCD_D6, GLCD_D7);
+
 // Select your display
 ST7735 tft(&mySpi, ST7735::BlackTab);
 //ST7735 tft(&mySpi, ST7735::RedTab);
 //ST7735 tft(&mySpi, ST7735::GreenTab);
 //ST7735 tft(&mySpi, ST7735::TypeB);
 
+//KS0108 tft(&chip1, &chip2);
 //  Other definitions for the Ada shield and playing with it...
 //  Joystick directions - Works with our screen rotation (1), yaay
 enum { Neutral, Press, Up, Down, Right, Left };
@@ -62,16 +80,18 @@ enum arrows { uarr = 0x18, darr = 0x19, larr = 0x1b, rarr = 0x1a, upyr = 0x1e, d
 
 ////////////////////////////////////////////////////////////////////////////////
 void setup(){
+//	analogWrite(3, 256);
+
 	//  Setup the Adafruit 1.8" TFT
 	tft.initializeDevice();    //  "tab color" from screen protector; there's RED and GREEN, too.
 	tft.setRotation(1);
 	tft.setTextColor(Color::Red);
 	//  size 2 template:	1234567890123 <-- if last char is ON 13, \n not req'd; driver inserts it (enabled via wrap member)
 	//  size 1 template:	12345678901234567890123456 <-- if last char is ON 26, \n not req'd; driver inserts it
-	tft.setTextSize(1); //  1 = 5x8, 2 = 10x16; chars leave blank pixel on bottom
+	tft.setFont(Fonts::Topaz); //  1 = 5x8, 2 = 10x16; chars leave blank pixel on bottom
 	cls();
-	tft.setCursor(0, 20);
-	sprintf(text,"Play with joystick --%c", rarr);
+	tft.setCursor(0, 10);
+	sprintf(text,"Play with joystick %c", rarr);
 	tft.print(text);
 	//  Is this required by law? Who needs Serial when you've got a TFT
 	Serial.begin(9600);
@@ -84,6 +104,7 @@ void cls() {
 }
 ////////////////////////////////////////////////////////////////////////////////
 void loop() {
+	tft.setFont(Fonts::Topaz);
 	if( doMenu() ){
 		//  something happened with joystick, do we care?
 	} else {
@@ -92,6 +113,7 @@ void loop() {
 		//	normally lives in the else{} above but then you don't see A3 change & that's no fun
 		tft.setTextColor(Color::SeaGreen);
 		tft.setCursor(0,105);
+		tft.setFont(Fonts::Topaz);
 		tft.print(  "A0   A1   A2   A3\n");
 		sprintf(text,"%-4d %-4d %-4d %-4d\n"
 			,analogRead(A0)
@@ -101,14 +123,20 @@ void loop() {
 		);
 		tft.print(text);
 
+
+		tft.setFont(Fonts::Default);
 		tft.setTextColor(Color::LightGray);
 		sprintf(text,"%s\n", version);
 		tft.print(text);
 
-		tft.setTextColor(Color::Yellow);
-		tft.setCursor(50, 50);
-		tft.print(millis());
-		tft.setTextColor(Color::Red);
+		tft.setFont(Fonts::UbuntuR);
+		tft.setTextColor(Color::SkyBlue);
+		tft.setCursor(0, 40);
+		tft.print("Joystick:");		
+		tft.setTextColor(Color::Goldenrod);
+		tft.setCursor(40, 70);
+		sprintf(text, "%4d    ", analogRead(A3));
+		tft.print(text);
 }
 ////////////////////////////////////////////////////////////////////////////////
 //  note: button is handled in order of Neutral( or none ),
@@ -118,7 +146,7 @@ bool doMenu( void ){
 	if( b == Neutral ){
 		return false;   //  user input didn't happen
 	}
-	tft.setCursor(0,10);
+	tft.setCursor(0,0);
 	//  const char* Buttons[]={"Neutral", "Press", "Up", "Down", "Right", "Left" };
 	if( b == Up ) {
 		tft.setTextColor(Color::Pink);

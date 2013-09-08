@@ -13,6 +13,7 @@
 // Base classes
 #include <TFTCommunicator.h>
 #include <Color.h>
+#include <Fonts.h>
 
 class TFT : public Print
 {
@@ -32,8 +33,6 @@ class TFT : public Print
         void drawRGBA(int16_t x, int16_t y, const uint16_t *bitmap, int16_t w, int16_t h, uint16_t trans);
         void setCursor(int16_t x, int16_t y);
         int16_t getCursor(boolean x);
-        void setTextSize(uint8_t s);
-        uint8_t getTextSize();
         void setTextColor(uint16_t c);
         void setTextColor(uint16_t fg, uint16_t bg);
         void invertTextColor();
@@ -45,6 +44,7 @@ class TFT : public Print
         virtual void setPixel(int16_t x, int16_t y, uint16_t color) {};
         void fillScreen(uint16_t color);
         void fillRectangle(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
+        void setFont(const uint8_t *f);
         virtual void drawHorizontalLine(int16_t x, int16_t y, int16_t w, uint16_t color) {};
         virtual void drawVerticalLine(int16_t x, int16_t y, int16_t h, uint16_t color) {};
         virtual void initializeDevice() {};
@@ -68,7 +68,10 @@ class TFT : public Print
     private:
         void drawCircleHelper( int16_t x0, int16_t y0, int16_t r, uint8_t cornername, uint16_t color);
         void fillCircleHelper(int16_t x0, int16_t y0, int16_t r, uint8_t cornername, int16_t delta, uint16_t color);
-        void drawChar(int16_t x, int16_t y, unsigned char c, uint16_t color, uint16_t bg, uint8_t size);
+        uint8_t drawChar(int16_t x, int16_t y, unsigned char c, uint16_t color, uint16_t bg);
+
+    protected:
+        const uint8_t *font;
 
 };
 

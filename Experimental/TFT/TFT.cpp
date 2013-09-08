@@ -4,24 +4,22 @@
 ////////////////////////////////////////////////////////////////////////////////
 #include <TFT.h>
 
-#include <font.h>
-
 TFT::TFT() {
     _comm = NULL;
     cursor_y = cursor_x = 0;
-    textsize = 1;
     textcolor = 0xFFFF;
     textbgcolor = 0;
     wrap = true;
+    font = Fonts::Default;
 }
 
 TFT::TFT(TFTCommunicator *comm) {
     _comm = comm;
     cursor_y = cursor_x = 0;
-    textsize = 1;
     textcolor = 0xFFFF;
     textbgcolor = 0;
     wrap = true;
+    font = Fonts::Default;
 }
 
 
@@ -331,18 +329,25 @@ size_t TFT::write(uint8_t c) {
 #else
 void TFT::write(uint8_t c) {
 #endif
+    uint8_t lpc = font[0];
+    uint8_t bpl = font[1];
+    uint8_t startGlyph = font[2]; // First character in data
+    uint8_t endGlyph = font[3]; // Last character in data
+
+    uint16_t charstart = (c * ((lpc * bpl) + 1)) + 4; // Start of character data
+    uint8_t charwidth = font[charstart++];
+
     if (c == '\n') {
-        cursor_y += textsize*8;
+        cursor_y += lpc;
         cursor_x = 0;
     } else if (c == '\r') {
         // skip em
     } else {
-        drawChar(cursor_x, cursor_y, c, textcolor, textbgcolor, textsize);
-        cursor_x += textsize*6;
-        if (wrap && (cursor_x > (_width - textsize*6))) {
-            cursor_y += textsize*8;
+        if (wrap && (cursor_x > (_width - charwidth))) {
+            cursor_y += lpc;
             cursor_x = 0;
         }
+        cursor_x += drawChar(cursor_x, cursor_y, c, textcolor, textbgcolor);
     }
 #if ARDUINO >= 100
     return 1;
@@ -350,39 +355,48 @@ void TFT::write(uint8_t c) {
 }
 
 // draw a character
-void TFT::drawChar(int16_t x, int16_t y, unsigned char c, uint16_t color, uint16_t bg, uint8_t size) {
+uint8_t TFT::drawChar(int16_t x, int16_t y, unsigned char c, uint16_t color, uint16_t bg) {
+
+    uint8_t lpc = font[0];  // Lines per character
+    uint8_t bpl = font[1];  // Bytes per line
+    uint8_t startGlyph = font[2]; // First character in data
+    uint8_t endGlyph = font[3]; // Last character in data
+
+    if (c < startGlyph || c > endGlyph) {
+        return 0;
+    }
+
+    c = c - startGlyph;
+
+    // Start of this character's data is the character number multiplied by the
+    // number of lines in a character (plus one for the character width) multiplied
+    // by the number of bytes in a line, and then offset by 4 for the header.
+    uint32_t charstart = (c * ((lpc * bpl) + 1)) + 4; // Start of character data
+    uint8_t charwidth = font[charstart++]; // The first byte of a block is the width of the character
 
     if((x >= _width)            || // Clip right
         (y >= _height)           || // Clip bottom
-        ((x + 5 * size - 1) < 0) || // Clip left
-        ((y + 8 * size - 1) < 0))   // Clip top
-        return;
+        ((x + charwidth - 1) < 0) || // Clip left
+        ((y + lpc - 1) < 0))   // Clip top
+        return 0;
 
-    for (int8_t i=0; i<6; i++ ) {
-        uint8_t line;
-        if (i == 5) 
-            line = 0x0;
-        else {
-            uint16_t offset=(c*5)+i;
-            line = font[offset];
+    for (int8_t i = 0; i < lpc; i++ ) {
+        uint32_t line = 0;
+        for (int8_t j = 0; j < bpl; j++) {
+            line <<= 8;
+            line |= font[charstart + (i * bpl) + j];
         }
-        for (int8_t j = 0; j<8; j++) {
+
+        for (int8_t j = 0; j < charwidth; j++) {
             if (line & 0x1) {
-                if (size == 1) // default size
-                    setPixel(x+i, y+j, color);
-                else {  // big size
-                    fillRectangle(x+(i*size), y+(j*size), size, size, color);
-                } 
+                setPixel(x+j, y+i, color);
             } else if (bg != color) {
-                if (size == 1) // default size
-                    setPixel(x+i, y+j, bg);
-                else {  // big size
-                    fillRectangle(x+i*size, y+j*size, size, size, bg);
-                } 	
+                setPixel(x+j, y+i, bg);
             }
             line >>= 1;
         }
     }
+    return charwidth;
 }
 
 void TFT::setCursor(int16_t x, int16_t y) {
@@ -394,13 +408,6 @@ int16_t TFT::getCursor(boolean x) {
         return cursor_x;
     return cursor_y;
 }
-void TFT::setTextSize(uint8_t s) {
-    textsize = (s > 0) ? s : 1;
-}
-uint8_t TFT::getTextSize() {
-    return textsize;
-}
-
 
 void TFT::setTextColor(uint16_t c) {
     textcolor = c;
@@ -432,3 +439,6 @@ uint16_t TFT::color565(uint8_t r, uint8_t g, uint8_t b) {
     return ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3);
 }
 
+void TFT::setFont(const uint8_t *f) {
+    font = f;
+}
