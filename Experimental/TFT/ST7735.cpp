@@ -5,9 +5,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 #include <TFT.h>
 
-#define ST7735_TFTWIDTH  128
-#define ST7735_TFTHEIGHT 160
-
 #define ST7735_NOP     0x00
 #define ST7735_SWRESET 0x01
 #define ST7735_RDDID   0x04
@@ -198,8 +195,8 @@ inline uint16_t swapcolor(uint16_t x) {
 
 void ST7735::initializeDevice() {
     colstart = rowstart = 0;
-    _width  = ST7735_TFTWIDTH;
-    _height = ST7735_TFTHEIGHT;
+    _width  = ST7735::Width;
+    _height = ST7735::Height;
     switch (_variant) {
         case GreenTab:
             streamCommands(Rcmd1);
@@ -346,23 +343,23 @@ void ST7735::setRotation(uint8_t m) {
 	switch (rotation) {
 		case 0:
 			_comm->writeData8(MADCTL_MX | MADCTL_MY | MADCTL_RGB);
-			_width  = ST7735_TFTWIDTH;
-			_height = ST7735_TFTHEIGHT;
+			_width  = ST7735::Width;
+			_height = ST7735::Height;
 			break;
 		case 1:
 		    _comm->writeData8(MADCTL_MY | MADCTL_MV | MADCTL_RGB);
-			_width  = ST7735_TFTHEIGHT;
-			_height = ST7735_TFTWIDTH;
+			_width  = ST7735::Height;
+			_height = ST7735::Width;
 			break;
 		case 2:
 			_comm->writeData8(MADCTL_RGB);
-			_width  = ST7735_TFTWIDTH;
-			_height = ST7735_TFTHEIGHT;
+			_width  = ST7735::Width;
+			_height = ST7735::Height;
 			break;
 		case 3:
 			_comm->writeData8(MADCTL_MX | MADCTL_MV | MADCTL_RGB);
-			_width  = ST7735_TFTHEIGHT;
-			_height = ST7735_TFTWIDTH;
+			_width  = ST7735::Height;
+			_height = ST7735::Width;
 			break;
 	}
 }

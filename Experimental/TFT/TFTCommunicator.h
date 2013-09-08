@@ -13,9 +13,9 @@ class TFTCommunicator
         virtual void commandStream(uint8_t command) {};
         virtual void dataStreamStart() {};
         virtual void dataStreamEnd() {};
-        virtual void dataStream8(uint16_t data) {};
+        virtual void dataStream8(uint8_t data) {};
         virtual void dataStream16(uint16_t data) {};
-        virtual void dataStream32(uint16_t data) {};
+        virtual void dataStream32(uint32_t data) {};
 };
 
 #endif

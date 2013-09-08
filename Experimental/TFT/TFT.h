@@ -51,6 +51,7 @@ class TFT : public Print
         virtual void displayOn() {};
         virtual void displayOff() {};
         virtual void invertDisplay(boolean i) {};
+        void update() {};
 #if ARDUINO >= 100
         size_t write(uint8_t c);
 #else
@@ -82,6 +83,7 @@ class TFT : public Print
 
 // Supported devices
 #include <ST7735.h>
+#include <ST7735FB.h>
 #include <KS0108.h>
 
 #endif

@@ -15,6 +15,8 @@ class ST7735 : public TFT {
         static const uint8_t RedTab     = 0x01;
         static const uint8_t BlackTab   = 0x02;
         static const uint8_t TypeB      = 0x03;
+        static const uint8_t Width      = 128;
+        static const uint8_t Height     = 160;
 
 		ST7735(TFTCommunicator *comms, uint8_t variant) : TFT(comms), _variant(variant) {}
 
