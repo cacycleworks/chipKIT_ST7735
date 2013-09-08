@@ -6,6 +6,15 @@
 
 #include <font.h>
 
+TFT::TFT() {
+    _comm = NULL;
+    cursor_y = cursor_x = 0;
+    textsize = 1;
+    textcolor = 0xFFFF;
+    textbgcolor = 0;
+    wrap = true;
+}
+
 TFT::TFT(TFTCommunicator *comm) {
     _comm = comm;
     cursor_y = cursor_x = 0;

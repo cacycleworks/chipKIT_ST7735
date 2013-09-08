@@ -17,6 +17,7 @@
 class TFT : public Print
 {
     public:
+        TFT();
         TFT(TFTCommunicator *comms);
         void drawCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color);
         void fillCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color);
@@ -74,9 +75,11 @@ class TFT : public Print
 // Supplorted communication systems
 #include <TFTDSPI.h>
 #include <TFTSoftSPI.h>
+#include <TFTPar8.h>
 
 // Supported devices
 #include <ST7735.h>
+#include <KS0108.h>
 
 #endif
 
