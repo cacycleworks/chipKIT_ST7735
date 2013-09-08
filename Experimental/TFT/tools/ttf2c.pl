@@ -6,10 +6,22 @@ use Data::Dumper;
 
 my $file = shift;
 my $points = shift;
+my $start = shift;
+my $end = shift;
 
 if(!$points) 
 {
     $points = 8;
+}
+
+if (!$start)
+{
+    $start = 0;
+}
+
+if (!$end)
+{
+    $end = 255;
 }
 
 if(!-f $file)
@@ -20,18 +32,22 @@ if(!-f $file)
 my $out = $file . ".cpp";
 my $name = $file;
 
-$name =~ s/\-//g;
 if($file =~ /^(.*)\.ttf/i)
 {
-	$out = $1 . ".cpp";
 	$name = $1;
 }
 
 if($name =~ /([^\/]+)$/)
 {
-    $out = $1 . ".cpp";
     $name = $1;
 }
+
+if ($name =~ /^(.*)-/)
+{
+    $name = $1;
+}
+$name .= $points;
+$out = $name . ".cpp";
 
 my $chardata;   # Array to store character data
 
@@ -53,7 +69,7 @@ $size->{bpl} = int($size->{width} / 8) + 1;
 
 print "Bytes per line: " . $size->{bpl} . "\n";
 
-if ($size->{bpl} > 4) {
+if ($size->{bpl} > 8) {
     print "ERROR: Font is too wide!\n";
     exit(10);
 }
@@ -70,9 +86,11 @@ print OUT "#include <TFT.h>\n\n";
 print OUT "const uint8_t Fonts::" . $name . "[] = {\n";
 
 printf(OUT "    %d, %d, 0x%02X, 0x%02X,\n",
-    $size->{height}, $size->{bpl}, 0, 255);
+    $size->{height}, $size->{bpl}, $start, $end);
 
-while($char < 256)
+my $char = $start;
+
+while($char < $end)
 {
     $img->filledRectangle(0,0,$size->{width},$size->{height},$bg);
     my @bb = $img->stringFT(-$fg,$file,$points,0,$size->{origin}->{x},$size->{origin}->{y},chr($char));

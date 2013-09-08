@@ -334,8 +334,6 @@ void TFT::write(uint8_t c) {
     uint8_t startGlyph = font[2]; // First character in data
     uint8_t endGlyph = font[3]; // Last character in data
 
-    uint16_t charstart = (c * ((lpc * bpl) + 1)) + 4; // Start of character data
-    uint8_t charwidth = font[charstart++];
 
     if (c == '\n') {
         cursor_y += lpc;
@@ -343,11 +341,16 @@ void TFT::write(uint8_t c) {
     } else if (c == '\r') {
         // skip em
     } else {
-        if (wrap && (cursor_x > (_width - charwidth))) {
-            cursor_y += lpc;
-            cursor_x = 0;
+        if (c >= startGlyph && c <= endGlyph) {
+            uint8_t co = c - startGlyph;
+            uint16_t charstart = (co * ((lpc * bpl) + 1)) + 4; // Start of character data
+            uint8_t charwidth = font[charstart++];
+            if (wrap && (cursor_x > (_width - charwidth))) {
+                cursor_y += lpc;
+                cursor_x = 0;
+            }
+            cursor_x += drawChar(cursor_x, cursor_y, c, textcolor, textbgcolor);
         }
-        cursor_x += drawChar(cursor_x, cursor_y, c, textcolor, textbgcolor);
     }
 #if ARDUINO >= 100
     return 1;
@@ -381,7 +384,7 @@ uint8_t TFT::drawChar(int16_t x, int16_t y, unsigned char c, uint16_t color, uin
         return 0;
 
     for (int8_t i = 0; i < lpc; i++ ) {
-        uint32_t line = 0;
+        uint64_t line = 0;
         for (int8_t j = 0; j < bpl; j++) {
             line <<= 8;
             line |= font[charstart + (i * bpl) + j];
