@@ -67,11 +67,11 @@ class TFT : public Print
         int16_t _width;
         int16_t _height;
         uint8_t rotation;
+        uint8_t drawChar(int16_t x, int16_t y, unsigned char c, uint16_t color, uint16_t bg);
 
     private:
         void drawCircleHelper( int16_t x0, int16_t y0, int16_t r, uint8_t cornername, uint16_t color);
         void fillCircleHelper(int16_t x0, int16_t y0, int16_t r, uint8_t cornername, int16_t delta, uint16_t color);
-        uint8_t drawChar(int16_t x, int16_t y, unsigned char c, uint16_t color, uint16_t bg);
 
     protected:
         const uint8_t *font;
@@ -84,8 +84,11 @@ class TFT : public Print
 #include <TFTPar8.h>
 #include <RawPar8.h>
 
-// Supported devices
+// Virtual display devices
 #include <Framebuffer.h>
+#include <Aggregator.h>
+
+// Supported devices
 #include <ST7735.h>
 #include <KS0108.h>
 #include <Matrix.h>

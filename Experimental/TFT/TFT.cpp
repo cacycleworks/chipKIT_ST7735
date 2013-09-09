@@ -380,12 +380,6 @@ uint8_t TFT::drawChar(int16_t x, int16_t y, unsigned char c, uint16_t color, uin
     uint32_t charstart = (c * ((lpc * bpl) + 1)) + 4; // Start of character data
     uint8_t charwidth = font[charstart++]; // The first byte of a block is the width of the character
 
-    if((x >= _width)            || // Clip right
-        (y >= _height)           || // Clip bottom
-        ((x + charwidth - 1) < 0) || // Clip left
-        ((y + lpc - 1) < 0))   // Clip top
-        return 0;
-
     for (int8_t i = 0; i < lpc; i++ ) {
         uint64_t line = 0;
         for (int8_t j = 0; j < bpl; j++) {

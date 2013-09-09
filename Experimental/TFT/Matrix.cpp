@@ -21,6 +21,8 @@ void Matrix::setPixel(int16_t x, int16_t y, uint16_t color) {
 
 void Matrix::initializeDevice() {
     currentRow = 0;
+    _width = 8;
+    _height = 8;
     T4CONbits.TCKPS = 0b010; // 1:4
     PR4 = 2000;
     IPC4bits.T4IP = 6;
