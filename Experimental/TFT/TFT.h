@@ -82,12 +82,13 @@ class TFT : public Print
 #include <TFTDSPI.h>
 #include <TFTSoftSPI.h>
 #include <TFTPar8.h>
+#include <RawPar8.h>
 
 // Supported devices
 #include <Framebuffer.h>
 #include <ST7735.h>
-//#include <ST7735FB.h>
 #include <KS0108.h>
+#include <Matrix.h>
 
 #endif
 

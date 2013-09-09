@@ -48,7 +48,7 @@ void TFT::drawCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color) {
 
         setPixel(x0 + x, y0 + y, color);
         setPixel(x0 - x, y0 + y, color);
-        (x0 + x, y0 - y, color);
+        setPixel(x0 + x, y0 - y, color);
         setPixel(x0 - x, y0 - y, color);
         setPixel(x0 + y, y0 + x, color);
         setPixel(x0 - y, y0 + x, color);
