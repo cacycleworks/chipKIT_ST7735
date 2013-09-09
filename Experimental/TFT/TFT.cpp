@@ -116,12 +116,12 @@ void TFT::fillCircleHelper(int16_t x0, int16_t y0, int16_t r, uint8_t cornername
         f     += ddF_x;
 
         if (cornername & 0x1) {
-            drawVerticalLine(x0+x, y0-y, 2*y+1+delta, color);
-            drawVerticalLine(x0+y, y0-x, 2*x+1+delta, color);
+            drawVerticalLine(x0+x, y0-y, 2*y+0+delta, color);
+            drawVerticalLine(x0+y, y0-x, 2*x+0+delta, color);
         }
         if (cornername & 0x2) {
-            drawVerticalLine(x0-x, y0-y, 2*y+1+delta, color);
-            drawVerticalLine(x0-y, y0-x, 2*x+1+delta, color);
+            drawVerticalLine(x0-x, y0-y, 2*y+0+delta, color);
+            drawVerticalLine(x0-y, y0-x, 2*x+0+delta, color);
         }
     }
 }
@@ -176,12 +176,16 @@ void TFT::drawRectangle(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t col
 }
 
 void TFT::fillRectangle(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color) {
-    fillRectangle(x, y, w, h, color);
+    for (int i = 0; i < h; i++) {
+        for (int j = 0; j < w; j++) {
+            setPixel(x + j, y + i, color);
+        }
+    }
 }
 
 
 void TFT::fillScreen(uint16_t color) {
-    fillScreen(color);
+    fillRectangle(0, 0, _width, _height, color);
 }
 
 // draw a rounded rectangle!
@@ -334,7 +338,6 @@ void TFT::write(uint8_t c) {
     uint8_t startGlyph = font[2]; // First character in data
     uint8_t endGlyph = font[3]; // Last character in data
 
-
     if (c == '\n') {
         cursor_y += lpc;
         cursor_x = 0;
@@ -444,4 +447,12 @@ uint16_t TFT::color565(uint8_t r, uint8_t g, uint8_t b) {
 
 void TFT::setFont(const uint8_t *f) {
     font = f;
+}
+
+void TFT::update(const Framebuffer& fb) {
+    for (int y = 0; y < _height; y++) {
+        for (int x = 0; x < _width; x++) {
+            setPixel(x, y, fb.colorAt(x, y));
+        }
+    }
 }

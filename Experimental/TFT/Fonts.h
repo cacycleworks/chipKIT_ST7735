@@ -44,6 +44,42 @@ class Fonts {
         static const uint8_t OldStandard36[];
         static const uint8_t OldStandard38[];
         static const uint8_t OldStandard40[];
+
+        static const uint8_t Arial8[];
+        static const uint8_t Arial10[];
+        static const uint8_t Arial12[];
+        static const uint8_t Arial14[];
+        static const uint8_t Arial16[];
+        static const uint8_t Arial18[];
+        static const uint8_t Arial20[];
+        static const uint8_t Arial22[];
+        static const uint8_t Arial24[];
+        static const uint8_t Arial26[];
+        static const uint8_t Arial28[];
+        static const uint8_t Arial30[];
+        static const uint8_t Arial32[];
+        static const uint8_t Arial34[];
+        static const uint8_t Arial36[];
+        static const uint8_t Arial38[];
+        static const uint8_t Arial40[];
+
+        static const uint8_t ArialBold8[];
+        static const uint8_t ArialBold10[];
+        static const uint8_t ArialBold12[];
+        static const uint8_t ArialBold14[];
+        static const uint8_t ArialBold16[];
+        static const uint8_t ArialBold18[];
+        static const uint8_t ArialBold20[];
+        static const uint8_t ArialBold22[];
+        static const uint8_t ArialBold24[];
+        static const uint8_t ArialBold26[];
+        static const uint8_t ArialBold28[];
+        static const uint8_t ArialBold30[];
+        static const uint8_t ArialBold32[];
+        static const uint8_t ArialBold34[];
+        static const uint8_t ArialBold36[];
+        static const uint8_t ArialBold38[];
+        static const uint8_t ArialBold40[];
 };
 
 #endif

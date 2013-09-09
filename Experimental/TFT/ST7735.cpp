@@ -367,3 +367,24 @@ void ST7735::setRotation(uint8_t m) {
 void ST7735::invertDisplay(boolean i) {
 	_comm->writeCommand(i ? ST7735_INVON : ST7735_INVOFF);
 }
+
+void ST7735::update(const Framebuffer& fb) {
+    setAddrWindow(0, 0, _width, _height);
+    uint32_t pixpair = 0;
+    uint16_t color = 0;
+
+    _comm->dataStreamStart();
+    for (int y = 0; y < _height; y++) {
+        for (int x = 0; x < _width; x+=2) {
+            color = fb.colorAt(x, y);
+            if (_variant == ST7735::BlackTab) color = swapcolor(color);
+            pixpair = color << 16;
+            color = fb.colorAt(x+1, y);
+            if (_variant == ST7735::BlackTab) color = swapcolor(color);
+            pixpair |= color;
+            _comm->dataStream32(pixpair);
+        }
+    }
+    _comm->dataStreamEnd();
+}
+
