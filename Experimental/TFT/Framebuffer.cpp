@@ -128,6 +128,9 @@ void Framebuffer::drawIndexed(int16_t x, int16_t y, const Framebuffer& fb, uint8
 struct sprite * Framebuffer::addSprite(const uint8_t *data, uint16_t w, uint16_t h, uint8_t t, uint8_t f) {
     struct sprite *scan;
     struct sprite *s = (struct sprite *)malloc(sizeof(struct sprite));
+    if (!s) {
+        return NULL;
+    }
     s->data = data;
     s->width = w;
     s->height = h;
