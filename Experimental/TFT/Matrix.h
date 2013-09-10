@@ -6,8 +6,8 @@
 class Matrix : public TFT {
 
 	public:
-        const static int16_t Width = 8;
-        const static int16_t Height = 8;
+        const static int16_t Width = 32;
+        const static int16_t Height = 32;
 
 		Matrix(TFTCommunicator *row, TFTCommunicator *col) : TFT(NULL), _row(row), _col(col) {}
 
@@ -24,7 +24,7 @@ class Matrix : public TFT {
 	protected:
         TFTCommunicator *_row;
         TFTCommunicator *_col;
-        uint8_t buffer[8];
+        uint32_t buffer[32];
         uint8_t currentRow;
 };
 

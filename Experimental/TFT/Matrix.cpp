@@ -3,8 +3,8 @@
 struct MatrixISRList *ISRlist = NULL;
 
 void Matrix::fillScreen(uint16_t color) {
-    for (int i = 0; i < 8; i++) {
-        buffer[i] = color ? 255 : 0;
+    for (int i = 0; i < 32; i++) {
+        buffer[i] = color ? 0xFFFFFFFF : 0;
     }
 }
 
@@ -44,9 +44,9 @@ void Matrix::initializeDevice() {
 void Matrix::ISR() {
     currentRow ++;
     currentRow %= 8;
-    _col->writeData8(255);
-    _row->writeData8(1 << currentRow);
-    _col->writeData8(~buffer[currentRow]);
+    _col->writeData32(0xFFFFFFFF);
+    _row->writeData32(1 << currentRow);
+    _col->writeData32(~buffer[currentRow]);
 }
 
 extern "C" {

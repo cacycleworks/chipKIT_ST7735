@@ -82,7 +82,7 @@ class TFT : public Print
 #include <TFTDSPI.h>
 #include <TFTSoftSPI.h>
 #include <TFTPar8.h>
-#include <RawPar8.h>
+#include <RawPar.h>
 
 // Virtual display devices
 #include <Framebuffer.h>
