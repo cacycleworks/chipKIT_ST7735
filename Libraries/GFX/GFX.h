@@ -54,6 +54,7 @@ class GFX : public Print {
 		void setCursor(int16_t x, int16_t y);
 		int16_t getCursor(boolean x);
 		void setTextColor(uint16_t c);
+		uint16_t getTextColor();
 		void setTextColor(uint16_t c, uint16_t bg);
 		void invertTextColor( );
 		void setTextSize(uint8_t s);
