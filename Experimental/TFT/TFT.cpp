@@ -450,3 +450,7 @@ void TFT::update(const Framebuffer& fb) {
         }
     }
 }
+
+uint16_t TFT::getTextColor() {
+    return textcolor;
+}

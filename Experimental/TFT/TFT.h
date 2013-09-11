@@ -37,6 +37,7 @@ class TFT : public Print
         int16_t getCursor(boolean x);
         void setTextColor(uint16_t c);
         void setTextColor(uint16_t fg, uint16_t bg);
+        uint16_t getTextColor();
         void invertTextColor();
         void setTextWrap(boolean w);
         int16_t width(void);
@@ -92,6 +93,7 @@ class TFT : public Print
 #include <ST7735.h>
 #include <KS0108.h>
 #include <Matrix.h>
+#include <PAL.h>
 
 #endif
 

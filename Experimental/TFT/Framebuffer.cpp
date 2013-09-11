@@ -97,6 +97,54 @@ void Framebuffer::drawIndexed(int16_t x, int16_t y, const uint8_t *data, uint16_
     }
 }
 
+void Framebuffer::drawTransformed(int16_t x, int16_t y, const uint8_t *data, uint16_t w, uint16_t h, uint8_t transform) {
+    uint32_t pos;
+    for (int j = 0; j < h; j++) {
+        for (int i = 0; i < w; i++) {
+            pos = j * w + i;
+            switch (transform) {
+                default:
+                    setPixel(x + i, y + j, data[pos]);
+                    break;
+                case MirrorH:
+                    setPixel(w - (x + i) - 1, y + j, data[pos]);
+                    break;
+                case MirrorV:
+                    setPixel(x + i, h - (y + j) - 1, data[pos]);
+                    break;
+                case Rotate180:
+                    setPixel(w - (x + i) - 1, h - (y + j) - 1, data[pos]);
+                    break;
+            }
+        }
+    }
+}
+
+void Framebuffer::drawTransformed(int16_t x, int16_t y, const uint8_t *data, uint16_t w, uint16_t h, uint8_t transform, uint8_t t) {
+    uint32_t pos;
+    for (int j = 0; j < h; j++) {
+        for (int i = 0; i < w; i++) {
+            pos = j * w + i;
+            if (data[pos] != t) {
+                switch (transform) {
+                    default:
+                        setPixel(x + i, y + j, data[pos]);
+                        break;
+                    case MirrorH:
+                        setPixel(w - (x + i) - 1, y + j, data[pos]);
+                        break;
+                    case MirrorV:
+                        setPixel(x + i, h - (y + j) - 1, data[pos]);
+                        break;
+                    case Rotate180:
+                        setPixel(w - (x + i) - 1, h - (y + j) - 1, data[pos]);
+                        break;
+                }
+            }
+        }
+    }
+}
+
 void Framebuffer::drawIndexed(int16_t x, int16_t y, const Framebuffer& fb) {
     uint32_t pos;
     uint16_t w = fb._width;
@@ -120,6 +168,60 @@ void Framebuffer::drawIndexed(int16_t x, int16_t y, const Framebuffer& fb, uint8
             pos = j * w + i;
             if (fb.buffer[pos] != t) {
                 setPixel(x + i, y + j, fb.buffer[pos]);
+            }
+        }
+    }
+}
+
+void Framebuffer::drawTransformed(int16_t x, int16_t y, const Framebuffer& fb, uint8_t transform) {
+    uint32_t pos;
+    uint16_t w = fb._width;
+    uint16_t h = fb._height;
+
+    for (int j = 0; j < h; j++) {
+        for (int i = 0; i < w; i++) {
+            pos = j * w + i;
+            switch (transform) {
+                default:
+                    setPixel(x + i, y + j, fb.buffer[pos]);
+                    break;
+                case MirrorH:
+                    setPixel(w - (x + i) - 1, y + j, fb.buffer[pos]);
+                    break;
+                case MirrorV:
+                    setPixel(x + i, h - (y + j) - 1, fb.buffer[pos]);
+                    break;
+                case Rotate180:
+                    setPixel(w - (x + i) - 1, h - (y + j) - 1, fb.buffer[pos]);
+                    break;
+            }
+        }
+    }
+}
+
+void Framebuffer::drawTransformed(int16_t x, int16_t y, const Framebuffer& fb, uint8_t transform, uint8_t t) {
+    uint32_t pos;
+    uint16_t w = fb._width;
+    uint16_t h = fb._height;
+
+    for (int j = 0; j < h; j++) {
+        for (int i = 0; i < w; i++) {
+            pos = j * w + i;
+            if (fb.buffer[pos] != t) {
+                switch (transform) {
+                    default:
+                        setPixel(x + i, y + j, fb.buffer[pos]);
+                        break;
+                    case MirrorH:
+                        setPixel(w - (x + i) - 1, y + j, fb.buffer[pos]);
+                        break;
+                    case MirrorV:
+                        setPixel(x + i, h - (y + j) - 1, fb.buffer[pos]);
+                        break;
+                    case Rotate180:
+                        setPixel(w - (x + i) - 1, h - (y + j) - 1, fb.buffer[pos]);
+                        break;
+                }
             }
         }
     }

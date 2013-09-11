@@ -21,12 +21,21 @@ class Framebuffer : public TFT {
     public:
         Framebuffer(int16_t w, int16_t h, uint8_t *b);
 
+        static const uint8_t MirrorH = 0x01;
+        static const uint8_t MirrorV = 0x02;
+        static const uint8_t Rotate180 = 0x03;
+
         // Basic drawing primitives
         void setPixel(int16_t x, int16_t y, uint16_t c);
         void drawIndexed(int16_t x, int16_t y, const uint8_t *data, uint16_t w, uint16_t h);
         void drawIndexed(int16_t x, int16_t y, const uint8_t *data, uint16_t w, uint16_t h, uint8_t t);
         void drawIndexed(int16_t x, int16_t y, const Framebuffer& fb);
         void drawIndexed(int16_t x, int16_t y, const Framebuffer& fb, uint8_t t);
+
+        void drawTransformed(int16_t x, int16_t y, const uint8_t *data, uint16_t w, uint16_t h, uint8_t transform);
+        void drawTransformed(int16_t x, int16_t y, const uint8_t *data, uint16_t w, uint16_t h, uint8_t transform, uint8_t t);
+        void drawTransformed(int16_t x, int16_t y, const Framebuffer& fb, uint8_t transform);
+        void drawTransformed(int16_t x, int16_t y, const Framebuffer& fb, uint8_t transform, uint8_t t);
 
         void drawVerticalLine(int16_t x, int16_t y, int16_t h, uint16_t color);
         void drawHorizontalLine(int16_t x, int16_t y, int16_t w, uint16_t color);
