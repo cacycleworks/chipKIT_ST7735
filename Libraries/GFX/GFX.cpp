@@ -434,6 +434,10 @@ uint8_t GFX::getTextSize() {
   return textsize;
 }
 
+uint16_t GFX::getTextColor() {
+  return textcolor;
+}
+
 
 void GFX::setTextColor(uint16_t c) {
   textcolor = c;
