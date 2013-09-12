@@ -49,43 +49,66 @@ enum arrows { uarr = 0x18, darr = 0x19, larr = 0x1b, rarr = 0x1a, upyr = 0x1e, d
 
 ////////////////////////////////////////////////////////////////////////////////
 //  size 1 template:	12345678901234567890123456 <-- if last char is ON 26, \n not req'd; driver inserts it
-static char version[]={"simpleMenu.ino 2013SEP11"};
+static char version[]={"simpleMenu.ino 2013SEP12"};
 char text[64];  // Made buffer big enough to hold two lines of text
 
 ////////////////////////////////////////////////////////////////////////////////
 //  Static menu manager
-#define MAX_SELECTIONS 4
+#define MAX_SELECTIONS 5
 #define MAX_PROMPT_LEN 20
-typedef struct _selection {
+
+struct MENUITEM {
+	char label[MAX_PROMPT_LEN];
+	int datatype;
+	void* ptrGlobal;
+	int min;
+	int max;
+	char** ptrGlobalLabels;
+}  ;
+
+float  _voltmod = 0.5;
+float* _voltPtr = &_voltmod;
+int 	_vendorID = 0;
+int* 	_vendorPtr = &_vendorID;
+enum    _vendorIDs { WELLS, USBANK, SOCU };
+static char *_vendorLabels[] = { "Wells Fargo","US Bank","Credit Union" };
+enum _menuitems { BANK, VOLT };
+enum _menuDataTypes { INT, FLOAT, OPTION };
+static MENUITEM _mi_list[]={// type, ptrGlobal, Min,    Max,    			ptrGlobalLabels
+	{ "Banking unit:", 		OPTION,	_vendorPtr,	0,	 (sizeof(_vendorIDs)-2), _vendorLabels  },
+	{ "Voltage ratio 0-1:", FLOAT, 	_voltPtr, 	0,		1,					NULL }
+};
+
+static uint16_t menu_color = WHITE;
+
+struct SELECTION {
 	char label[MAX_PROMPT_LEN];
 	void(*function) ( int );
 	int fn_arg;
-} SELECTION ;
+}  ;
 
-typedef struct _menu {
+struct MENU {
 	int id;
 	char label[MAX_PROMPT_LEN];
 	int num_selections;
 	SELECTION selection[MAX_SELECTIONS];
-} MENU;
+} ;
 //  enumerated menu ids must be in order of static MENU menu[], as they are same as array's index
-enum _menus { MAIN_MENU, DEPOSIT_MENU, WITHDRAWL_MENU, BALANCE_MENU };
-enum _menu_keys { DEPOSIT, WITHDRAWL, BALANCE, CHECKING, SAVINGS };
+enum _menus { MAIN_MENU, DEPWD_MENU, BALANCE_MENU };
+enum _menu_keys { CHECKING, SAVINGS };
 //  MENU menu[] is simple static list of menus; the only "nesting" is that the [0] entry
 //	must be the top of the menus, a la MAIN_MENU otherwise, nesting is defined by the selections array
 static MENU menu[] = {
-	{ MAIN_MENU, "Main Menu", 4, {
-		{"Perform A Deposit", goto_menu, DEPOSIT_MENU},
-		{"Perform a Withdrawl", goto_menu, WITHDRAWL_MENU },
+	{ MAIN_MENU, "Main Menu", 5, {
+		{"Bank", menu_edit, static_cast<int>(BANK) },
+		{"Brightness", menu_edit, static_cast<int>(VOLT) },
+		{"Withdrawl & Deposit", goto_menu, DEPWD_MENU},
 		{"Get Balance", goto_menu, BALANCE_MENU },
 		{"Hide Menu", menu_hide, 0} }
 	},
-	{ DEPOSIT_MENU, "Deposit Menu", 3, {
+	{ DEPWD_MENU, "Withdrawl & Deposit", 5, {
 		{"Deposit to Checking", do_deposit, CHECKING},
 		{"Deposit to Savings", do_deposit, SAVINGS},
-		{"Go Back", goto_menu, MAIN_MENU} }
-	},
-	{ WITHDRAWL_MENU, "Withdrawl Menu", 3, {
 		{"Withdrawl: Checking", do_withdrawl, CHECKING},
 		{"Withdrawl: Savings", do_withdrawl, SAVINGS},
 		{"Go Back", goto_menu, MAIN_MENU} }
@@ -96,11 +119,94 @@ static MENU menu[] = {
 		{"Go Back", goto_menu, MAIN_MENU} }
 	}
 };
+
 MENU * curr_menu = menu;
 int menu_enable = 0;
 //  curr_selection is the SELECTION array index of the curr_menu
 int curr_selection = 0;
-static uint16_t menu_color = WHITE;
+void menu_hide( int ){ menu_enable = 0; cls; draw_menu(); }
+////////////////////////////////////////////////////////////////////////////////
+//  Empty, sample action handling example functions
+void sample_func(){
+	tft.setCursor(0,60);	uint16_t colorsave = tft.getTextColor(); tft.setTextColor( menu_color );
+	tft.print( text );
+	delay( 4000 );
+	cls();  tft.setTextColor( colorsave );
+	draw_menu();
+}
+void do_deposit( int key ){
+	sprintf( text, "%s %d\n\nGimme that paper!", __FUNCTION__, key );
+	sample_func();
+}
+void do_withdrawl( int key ){
+	sprintf( text, "%s %d\n\nYou can has some moniez", __FUNCTION__, key );
+	sample_func();
+}
+void show_balance( int key ){
+	sprintf( text, "%s %d\n\nOMG you're RICH!", __FUNCTION__, key );
+	sample_func();
+}
+////////////////////////////////////////////////////////////////////////////////
+// Edit menu controller with cheesey type-dependent special cases
+void menu_edit( int item ){
+	cls();
+	uint16_t colorsave = tft.getTextColor();
+	tft.setTextColor( menu_color );
+	tft.invertTextColor();
+	tft.print(" EDIT MODE ");
+	tft.invertTextColor();
+	//  size 1 		     123456789012345  123457890134567890123<-- if last char is ON 26, \n not req'd; driver inserts it
+	sprintf( text, "\n\nPress %c to exit\nUse %c & %c to adjust\n\n", larr, uarr, darr );
+	tft.print( text );
+	//  store where cursor currently is
+	int _x = tft.getCursor( 1 );
+	int _y = tft.getCursor( 0 );
+	for( uint8_t b = checkJoystick(); b != Left; b = checkJoystick() ) {
+		void* tempNum;
+		int *tempI;
+        tft.setCursor(_x,_y);
+        sprintf( text, "%s:\n", _mi_list[item].label );
+        tft.print(text);
+		tft.setTextSize(2);
+		if( _mi_list[item].datatype == FLOAT ){
+			float *tempF = reinterpret_cast<float *>(_mi_list[item].ptrGlobal);
+			if( b == Up  )
+				*tempF += 0.1;
+			else if( b == Down )
+				*tempF -= 0.1;
+			if( *tempF < _mi_list[item].min - 0.01 ){ *tempF = _mi_list[item].min; }
+			if( *tempF > _mi_list[item].max + 0.01 ){ *tempF = _mi_list[item].max; }
+			sprintf( text, "%.1f\n", *tempF );
+		}
+		//  this is intentionally NOT an if-else-if, as INT and OPTION need same int value increment
+		if( _mi_list[item].datatype == OPTION || _mi_list[item].datatype == INT ) {
+			tempI =  reinterpret_cast<int *>(_mi_list[item].ptrGlobal);
+			if( b == Up  )
+				*tempI += 1;
+			else if( b == Down )
+				*tempI -= 1;
+			//  ints can implement wrap... might confuse but oh well...
+			if( *tempI < _mi_list[item].min ) *tempI = _mi_list[item].max;
+			if( *tempI > _mi_list[item].max ) *tempI = _mi_list[item].min;
+		}
+		if( _mi_list[item].datatype == OPTION )
+			sprintf( text, "%-12.12s\n", _mi_list[item].ptrGlobalLabels[*tempI] );
+		if( _mi_list[item].datatype == INT )
+			sprintf( text, "%d\n", *tempI );
+        tft.print(text);
+		tft.setTextSize(1);
+		//	if( _mi_list[item].datatype == OPTION ) {
+		//	sprintf( text, "option index = %d, max = %d\n", *tempI, _mi_list[item].max );
+		//	tft.print(text);
+		//	}
+		if( b ) // control repeat speed
+		    delay(250);
+	}
+	tft.setTextColor( colorsave );
+	cls();
+	draw_menu();
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Set & display active menu
 void goto_menu ( ) {
@@ -121,23 +227,6 @@ void goto_menu ( int newmenu ) {
 	cls();
 	draw_menu();
 	return;
-}
-////////////////////////////////////////////////////////////////////////////////
-void menu_hide( int ){ menu_enable = 0; cls; draw_menu(); }
-void do_deposit( int key ){
-	tft.setCursor(0,60);
-	sprintf( text, "%s %d", __FUNCTION__, key );
-	tft.print( text );
-}
-void do_withdrawl( int key ){
-	tft.setCursor(0,60);
-	sprintf( text, "%s %d", __FUNCTION__, key );
-	tft.print( text );
-}
-void show_balance( int key ){
-	tft.setCursor(0,60);
-	sprintf( text, "%s %d", __FUNCTION__, key );
-	tft.print( text );
 }
 ////////////////////////////////////////////////////////////////////////////////
 bool doMenu( void ){
@@ -307,4 +396,3 @@ byte checkJoystick() {
 	if (joystickState < 950) return Down;	// for rotation(3) Up;		//  down, reads 931
 	return Neutral;
 }
-
