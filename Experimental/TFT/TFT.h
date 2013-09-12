@@ -93,7 +93,7 @@ class TFT : public Print
 #include <ST7735.h>
 #include <KS0108.h>
 #include <Matrix.h>
-#include <PAL.h>
+#include <HD44780.h>
 
 #endif
 

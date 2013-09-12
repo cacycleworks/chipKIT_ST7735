@@ -129,7 +129,7 @@ void loop() {
 		sprintf(text,"%s\n", version);
 		tft.print(text);
 
-		tft.setFont(Fonts::UbuntuR);
+		tft.setFont(Fonts::Ubuntu8);
 		tft.setTextColor(Color::SkyBlue);
 		tft.setCursor(0, 40);
 		tft.print("Joystick:");		
