@@ -253,13 +253,6 @@ void setup(){
 	tft.setTextSize(1); //  1 = 5x8, 2 = 10x16; chars leave blank pixel on bottom
 	cls();
 
-	//  Start wire for RTC
-	Wire.begin();
-
-	//
-// 	tft.setCursor(0, 20);
-//	sprintf( text, "Play with joystick -%c", rarr );
-//	tft.print(text);
 	draw_menu();
 }
 
@@ -283,7 +276,7 @@ void loop() {
 void guiFooter(){
 	//	footer for the screen
 	tft.setTextColor(GREEN);
-	tft.setCursor(0,95);
+	tft.setCursor(0,105);
 	tft.print(  "A0   A1   A2   A3\n");
 	sprintf(text,"%-4d %-4d %-4d %-4d\n"
 		,analogRead(A0)
@@ -296,10 +289,6 @@ void guiFooter(){
 	tft.setTextColor(GRAY);
 	sprintf(text,"%s\n", version);
 	tft.print(text);
-
-	tft.setTextColor(BLUE);
-	getDate(date);
-	tft.print(date);
 
 	tft.setTextColor(RED);
 }
