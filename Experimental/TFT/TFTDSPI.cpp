@@ -1,5 +1,7 @@
 #include <TFT.h>
 
+#ifdef __PIC32MX__
+
 TFTDSPI::TFTDSPI(DSPI *spi, uint8_t cs, uint8_t dc) {
     _spi = spi;
     _cs = cs;
@@ -84,4 +86,6 @@ void TFTDSPI::dataStream32(uint32_t data) {
     _spi->setTransferSize(DSPI_32BIT);
     _spi->transfer(data);
 }
+
+#endif
 

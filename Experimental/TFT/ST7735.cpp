@@ -241,6 +241,9 @@ void ST7735::streamCommands(uint8_t *cmdlist) {
         }
         if(ms) {
             ms = *cmdlist;
+#ifndef __PIC32MX__
+            delay(ms);
+#endif
             cmdlist++;
         }
     }

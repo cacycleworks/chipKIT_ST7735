@@ -3,13 +3,13 @@
 
 #include <TFT.h>
 
-class Matrix : public TFT {
+class LEDMatrix : public TFT {
 
 	public:
         const static int16_t Width = 32;
         const static int16_t Height = 32;
 
-		Matrix(TFTCommunicator *row, TFTCommunicator *col) : TFT(NULL), _row(row), _col(col) {}
+		LEDMatrix(TFTCommunicator *row, TFTCommunicator *col) : TFT(NULL), _row(row), _col(col) {}
 
         void fillScreen(uint16_t color);
         void setPixel(int16_t x, int16_t y, uint16_t color);
@@ -19,7 +19,7 @@ class Matrix : public TFT {
         void displayOff() {} // Not implemented
 
         void initializeDevice();
-        void ISR();
+        void UpdateISR();
 
 	protected:
         TFTCommunicator *_row;
@@ -29,7 +29,7 @@ class Matrix : public TFT {
 };
 
 struct MatrixISRList {
-    Matrix *matrix;
+    LEDMatrix *matrix;
     struct MatrixISRList *next;
 };
 

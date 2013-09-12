@@ -80,7 +80,10 @@ class TFT : public Print
 };
 
 // Supplorted communication systems
+#ifdef __PIC32MX__
 #include <TFTDSPI.h>
+#endif
+
 #include <TFTSoftSPI.h>
 #include <TFTPar8.h>
 #include <RawPar.h>
@@ -92,7 +95,7 @@ class TFT : public Print
 // Supported devices
 #include <ST7735.h>
 #include <KS0108.h>
-#include <Matrix.h>
+#include <LEDMatrix.h>
 #include <HD44780.h>
 
 #endif
