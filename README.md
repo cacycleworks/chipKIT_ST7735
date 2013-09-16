@@ -17,6 +17,9 @@ Be sure to check out the ST7735B "Buffered" examples! Fantastic demonstration of
 4. The folders from this project, `GFX`, `ST7735`, and `ST7735B` will then extract into your Libraries folder.
 5. Start `mpide` (or must close and reopen already running mpide) and the demo examples will appear in the mpide menu File -> Examples -> ST7735 and ST7735B
 
+#### Experimental
+Majenko is working on an epic single body of code for controllers. "Experimental" is the manifestation of such. To use the Experimental code, first move GFX and ST7735 folders out from Libraries. Then copy TFT from Experimental to your Libraries folder. Or, use Majenko's UECIDE compiler, which won't confuse the ST7735.cpp in TFT/ with the ST7735 library. :)
+
 This project has anecdotal notations and discussion on http://www.chipkit.org/forum/viewtopic.php?f=18&t=2530
 
 Please make contributions or requests on that thread.
