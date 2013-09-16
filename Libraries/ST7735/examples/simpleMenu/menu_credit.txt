@@ -1,21 +1,39 @@
 Source of the menu framework is here:
 http://dec.bournemouth.ac.uk/staff/awatson/micro/articles/9509_066.pdf
 ... as published in:
-"Text Interfaces for Embedded Systems", Steve Drevik, Embedded Systems Programming September 1995 pp 66-78.
+"Text Interfaces for Embedded Systems", Steve Drevik, Embedded Systems
+Programming September 1995 pp 66-78.
 
-This decades old work is the sole example on the internet of a generic and flexible menu framework. Its simplicity is elegant. Note that the pseudo code does NOT compile, nor is even proper code. Be sure not to cut and paste it, instead type it in by hand, so that you catch the syntax errors accidentally applied because this was in printed media.
+This decades old work is the sole example on the internet of a generic and
+flexible menu framework. Its simplicity is elegant. Note that the pseudo code
+does NOT compile, nor is even proper code. Be sure not to cut and paste it,
+instead type it in by hand, so that you catch the syntax errors accidentally
+applied because this was in printed media.
 
-I spent a week researching trying to find an OOP way. Stack Exchange's Stack Overflow and Programmer's sites were of absolute no help. Asking there about something that could control menus actually got me redicule and harrassment. Props to http://www.gamedev.net/ forums, as they were the only other people on the Net who don't rely on fancy IDEs to handle the menuing automatically behind the scenes.
+I spent a week researching trying to find an OOP way. Stack Exchange's Stack
+Overflow and Programmer's sites were of absolute no help. Asking there about
+something that could control menus actually got me redicule and harrassment.
+Props to http://www.gamedev.net/ forums, as they were the only other people on
+the Net who don't rely on fancy IDEs to handle the menuing automatically behind
+the scenes.
 
 I never could figure out how to use OOP to tie in together the concepts:
 - Access to the display (or display object)
 - Callback functions to the code specific to this hardware/project
-- Layered menu navigation without the traditional giant if-else-if or switch with an option for each leaf
-- I specifically was not allowing the old-school C style **linked_list whose first members are *prev and *next.
+- Layered menu navigation without the traditional giant if-else-if or switch
+	with an option for each leaf
+- I specifically was not allowing the old-school C style **linked_list whose
+	first members are *prev and *next.
 - Directly edit program control variables without using callbacks
 
-Also hindering my OOP progress was how strict mpide's GCC 4.5.1 for windows shuts me down anytime I try to manipulate something that "isn't easy". And all this the Wizards and Gods of C++ on the Stack Exchange sites say about being able to do whatever you want with void* might work in their Visual Studio but none of their fancy code compiles for me. 
+Also hindering my OOP progress was how strict mpide's GCC 4.5.1 for windows
+shuts me down anytime I try to manipulate something that "isn't easy". And all
+this the Wizards and Gods of C++ on the Stack Exchange sites say about being
+able to do whatever you want with void* might work in their Visual Studio but
+none of their fancy code compiles for me.
 
-Credit also to OMMenuMgr for examples of how to just ram that pointer through the compiler. It works; nothing else could get the edit_menu() tools to work on the program's global control variables.
+Credit also to OMMenuMgr for examples of how to just ram that pointer through
+the compiler. It works; nothing else could get the edit_menu() tools to work on
+the program's global control variables.
 
 - Chris
