@@ -42,6 +42,8 @@ class Framebuffer : public TFT {
         void fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
         void fillScreen(uint16_t);
 
+        void copyRect(int16_t dx, int16_t dy, int16_t sx, int16_t sy, uint16_t w, uint16_t h);
+
         // Color control
         void setColor(uint8_t color, uint16_t rgb);
         void setColor(uint8_t color, uint8_t r, uint8_t g, uint8_t b);

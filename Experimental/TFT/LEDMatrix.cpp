@@ -9,7 +9,7 @@ void LEDMatrix::fillScreen(uint16_t color) {
 }
 
 void LEDMatrix::setPixel(int16_t x, int16_t y, uint16_t color) {
-    if (x < 0 || x >= 8 || y < 0 || y >= 8)
+    if (x < 0 || x >= _width || y < 0 || y >= _height)
         return;
 
     if (color) {
@@ -21,11 +21,11 @@ void LEDMatrix::setPixel(int16_t x, int16_t y, uint16_t color) {
 
 void LEDMatrix::initializeDevice() {
     currentRow = 0;
-    _width = 8;
-    _height = 8;
+    _width = _col->nativeWidth();
+    _height = _row->nativeWidth();
 #ifdef __PIC32MX__
     T4CONbits.TCKPS = 0b010; // 1:4
-    PR4 = 2000;
+    PR4 = 40000;
     IPC4bits.T4IP = 6;
     IFS0bits.T4IF = 0;
     IEC0bits.T4IE = 1;
@@ -45,7 +45,7 @@ void LEDMatrix::initializeDevice() {
 
 void LEDMatrix::UpdateISR() {
     currentRow ++;
-    currentRow %= 8;
+    currentRow %= _height;
     _col->writeData32(0xFFFFFFFF);
     _row->writeData32(1 << currentRow);
     _col->writeData32(~buffer[currentRow]);

@@ -20,6 +20,8 @@ class TFTPar8 : public TFTCommunicator
         void dataStream16(uint16_t);
         void dataStream32(uint32_t);
 
+        uint8_t nativeWidth() { return 8; };
+
     private:
         uint8_t _cs;
         uint8_t _dc;

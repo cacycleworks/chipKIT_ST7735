@@ -55,6 +55,7 @@ class TFT : public Print
         virtual void displayOff() {};
         virtual void invertDisplay(boolean i) {};
         virtual void update(const Framebuffer& fb);
+        virtual void update(const Framebuffer& fb, int16_t dx, int16_t dy);
 #if ARDUINO >= 100
         size_t write(uint8_t c);
 #else
@@ -85,6 +86,7 @@ class TFT : public Print
 #endif
 
 #include <TFTSoftSPI.h>
+#include <TFTPar4.h>
 #include <TFTPar8.h>
 #include <RawPar.h>
 
@@ -97,6 +99,8 @@ class TFT : public Print
 #include <KS0108.h>
 #include <LEDMatrix.h>
 #include <HD44780.h>
+#include <DOGMe.h>
+#include <ILI9340.h>
 
 #endif
 

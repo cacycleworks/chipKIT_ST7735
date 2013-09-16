@@ -37,9 +37,11 @@ RawPar::RawPar(uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3, uint8_t d4, uint8
     _d[30] = d30;
     _d[31] = d31;
 
+    _width = 0;
     for (int i = 0; i < 32; i++) {
         if (_d[i] != 255) { 
-            pinMode(_d[i], OUTPUT); digitalWrite(_d[i], LOW); 
+            pinMode(_d[i], OUTPUT); digitalWrite(_d[i], HIGH); 
+            _width++;
         }
     }
 
@@ -47,7 +49,9 @@ RawPar::RawPar(uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3, uint8_t d4, uint8
 
 void RawPar::setBus(uint32_t value) {
     for (int i = 0; i < 32; i++) {
-        digitalWrite(_d[i], value & (1 << i));
+        if (_d[i] != 255) {
+            digitalWrite(_d[i], (value >> i) & 1);
+        }
     }
 }
 
@@ -93,5 +97,9 @@ void RawPar::dataStream16(uint16_t data) {
 
 void RawPar::dataStream32(uint32_t data) {
     setBus(data);
+}
+
+uint8_t RawPar::nativeWidth() {
+    return _width;
 }
 

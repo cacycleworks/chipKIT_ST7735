@@ -25,8 +25,11 @@ class RawPar : public TFTCommunicator
         void dataStream32(uint32_t);
         void setBus(uint32_t);
 
+        uint8_t nativeWidth();
+
     private:
         uint8_t _d[32];
+        uint8_t _width;
 };
 
 #endif

@@ -20,6 +20,8 @@ class TFTDSPI : public TFTCommunicator
         void dataStream8(uint8_t);
         void dataStream16(uint16_t);
         void dataStream32(uint32_t);
+        uint8_t nativeWidth() { return 32; };
+
 
     private:
         DSPI *_spi;

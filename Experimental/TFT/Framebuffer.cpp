@@ -378,3 +378,25 @@ void Framebuffer::setSprite(struct sprite *s, uint8_t n, int8_t v) {
     s->store[n] = v;
 }
 
+void Framebuffer::copyRect(int16_t dx, int16_t dy, int16_t sx, int16_t sy, uint16_t w, uint16_t h) {
+    uint32_t dpos;
+    uint32_t spos;
+    for (int y = 0; y < w; y++) {
+        for (int x = 0; x < h; x++) {
+            if (sx > dx && sy > dy) {
+                dpos = (y + dy) * _width + (x + dx);
+                spos = (y + sy) * _width + (x + sx);
+            } else if(sx <= dx && sy > dy) {
+                dpos = (y + dy) * _width + ((w - x) + dx);
+                spos = (y + sy) * _width + ((w - x) + sx);
+            } else if(sx > dx && sy <= dy) {
+                dpos = ((h - y) + dy) * _width + (x + dx);
+                spos = ((h - y) + sy) * _width + (x + sx);
+            } else if(sx <= dx && sy <= dy) {
+                dpos = ((h - y) + dy) * _width + ((w - x) + dx);
+                spos = ((h - y) + sy) * _width + ((w - x) + sx);
+            }
+            buffer[dpos] = buffer[spos];
+        }
+    }
+}

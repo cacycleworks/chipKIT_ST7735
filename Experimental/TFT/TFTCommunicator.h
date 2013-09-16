@@ -16,6 +16,7 @@ class TFTCommunicator
         virtual void dataStream8(uint8_t data) {};
         virtual void dataStream16(uint16_t data) {};
         virtual void dataStream32(uint32_t data) {};
+        virtual uint8_t nativeWidth() { return 0; };
 };
 
 #endif

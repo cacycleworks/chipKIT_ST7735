@@ -444,9 +444,13 @@ void TFT::setFont(const uint8_t *f) {
 }
 
 void TFT::update(const Framebuffer& fb) {
+    update(fb, 0, 0);
+}
+
+void TFT::update(const Framebuffer& fb, int16_t dx, int16_t dy) {
     for (int y = 0; y < _height; y++) {
         for (int x = 0; x < _width; x++) {
-            setPixel(x, y, fb.colorAt(x, y));
+            setPixel(x, y, fb.colorAt(x + dx, y + dy));
         }
     }
 }
