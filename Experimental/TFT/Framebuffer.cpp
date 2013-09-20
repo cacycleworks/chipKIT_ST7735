@@ -1,5 +1,27 @@
 #include <TFT.h>
 
+Framebuffer::Framebuffer() {
+    _width = 0;
+    _height = 0;
+    sprites = NULL;
+    buffer = NULL;
+    setColor(0, Color::Black);
+    setColor(1, Color::DarkBlue);
+    setColor(2, Color::DarkRed);
+    setColor(3, Color::DarkMagenta);
+    setColor(4, Color::DarkGreen);
+    setColor(5, Color::DarkCyan);
+    setColor(6, Color::Orange);
+    setColor(7, Color::Gray75);
+    setColor(8, Color::Gray50);
+    setColor(9, Color::Blue);
+    setColor(10, Color::Red);
+    setColor(11, Color::Magenta);
+    setColor(12, Color::Green);
+    setColor(13, Color::Cyan);
+    setColor(14, Color::Yellow);
+    setColor(15, Color::White);
+}
 
 Framebuffer::Framebuffer(int16_t w, int16_t h, uint8_t *b) {
     _width = w;

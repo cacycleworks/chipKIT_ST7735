@@ -21,6 +21,8 @@ class TFTDSPI : public TFTCommunicator
         void dataStream16(uint16_t);
         void dataStream32(uint32_t);
         uint8_t nativeWidth() { return 32; };
+        void blockData(uint32_t *data, uint32_t len);
+
 
 
     private:

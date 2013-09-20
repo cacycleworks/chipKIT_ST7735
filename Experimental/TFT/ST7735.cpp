@@ -378,6 +378,8 @@ void ST7735::update(const Framebuffer& fb) {
 
     _comm->dataStreamStart();
     for (int y = 0; y < _height; y++) {
+        uint8_t l = y & 1;
+
         for (int x = 0; x < _width; x+=2) {
             color = fb.colorAt(x, y);
             if (_variant == ST7735::BlackTab) color = swapcolor(color);
@@ -385,8 +387,9 @@ void ST7735::update(const Framebuffer& fb) {
             color = fb.colorAt(x+1, y);
             if (_variant == ST7735::BlackTab) color = swapcolor(color);
             pixpair |= color;
-            _comm->dataStream32(pixpair);
+            _linebuffer[l][x >> 1] = pixpair;
         }
+        _comm->blockData(_linebuffer[l], _width>>1);
     }
     _comm->dataStreamEnd();
 }

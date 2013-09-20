@@ -39,6 +39,9 @@ class ST7735 : public TFT {
 		void streamCommands(uint8_t *cmdlist);
 		uint8_t colstart, rowstart;
         uint8_t _variant;
+
+        uint32_t _linebuffer[2][160];
+        uint8_t _xferline;
 };
 
 #endif

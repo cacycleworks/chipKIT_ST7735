@@ -44,16 +44,16 @@ class TFT : public Print
         int16_t height(void);
         uint16_t color565(uint8_t r, uint8_t g, uint8_t b);
 
-        virtual void setPixel(int16_t x, int16_t y, uint16_t color) {};
         void fillScreen(uint16_t color);
         void fillRectangle(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
         void setFont(const uint8_t *f);
-        virtual void drawHorizontalLine(int16_t x, int16_t y, int16_t w, uint16_t color) {};
-        virtual void drawVerticalLine(int16_t x, int16_t y, int16_t h, uint16_t color) {};
-        virtual void initializeDevice() {};
-        virtual void displayOn() {};
-        virtual void displayOff() {};
-        virtual void invertDisplay(boolean i) {};
+        virtual void setPixel(int16_t x, int16_t y, uint16_t color) = 0;
+        virtual void drawHorizontalLine(int16_t x, int16_t y, int16_t w, uint16_t color) = 0;
+        virtual void drawVerticalLine(int16_t x, int16_t y, int16_t h, uint16_t color) = 0;
+        virtual void initializeDevice() = 0;
+        virtual void displayOn() = 0;
+        virtual void displayOff() = 0;
+        virtual void invertDisplay(boolean i) = 0;
         virtual void update(const Framebuffer& fb);
         virtual void update(const Framebuffer& fb, int16_t dx, int16_t dy);
 #if ARDUINO >= 100
@@ -83,6 +83,7 @@ class TFT : public Print
 // Supplorted communication systems
 #ifdef __PIC32MX__
 #include <TFTDSPI.h>
+// Not ready yet: #include <TFTSPI.h>
 #endif
 
 #include <TFTSoftSPI.h>
@@ -92,6 +93,7 @@ class TFT : public Print
 
 // Virtual display devices
 #include <Framebuffer.h>
+#include <Framebuffer1.h>
 #include <Aggregator.h>
 
 // Supported devices
