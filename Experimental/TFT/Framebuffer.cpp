@@ -315,7 +315,7 @@ struct sprite *Framebuffer::spriteAt(int16_t x, int16_t y) const {
 }
 
 uint16_t Framebuffer::colorAt(int16_t x, int16_t y) const {
-    if (x < 0 || y < 0 || x >= _width || y >= _width) {
+    if (x < 0 || y < 0 || x >= _width || y >= _height) {
         return 0;
     }
     struct sprite *s = spriteAt(x, y);
@@ -422,3 +422,258 @@ void Framebuffer::copyRect(int16_t dx, int16_t dy, int16_t sx, int16_t sy, uint1
         }
     }
 }
+
+void Framebuffer::drawRLE(int16_t x, int16_t y, const uint8_t *data) {
+    uint32_t ptr = 0;
+    if (data[0] != 'R' || data[1] != 'L' || data[2] != 'E') {
+        return;
+    }
+    ptr = 3;
+    uint8_t depth = data[3];
+    if (depth != 8 && depth != 16) {
+        return;
+    }
+    uint32_t dlen = data[4] << 24 | data[5] << 16 | data[6] << 8 | data[7];
+    uint16_t w = data[8] << 8 | data[9];
+    uint16_t h = data[10] << 8 | data[11];
+    int16_t px = 0;
+    int16_t py = 0;
+
+    uint32_t i = 0;
+    while (i < dlen) {
+        if (data[12+i] != data[13+i]) {
+            setPixel(x + px, y + py, data[12+i]);
+            i++;
+            px ++;
+            if (px == w) {
+                px = 0;
+                py++;
+            }
+        } else {
+            uint16_t len = 0;
+            uint8_t col = data[12+i];
+            if (depth == 8) {
+                len = data[14+i];
+                i += 3;
+            } else if (depth == 16) {
+                len = data[14+i] << 8 | data[15+i];
+                i += 4;
+            }
+            for (uint32_t j = 0; j < len; j++) {
+                setPixel(x + px, y + py, col);
+                px ++;
+                if (px == w) {
+                    px = 0;
+                    py++;
+                }
+            }
+        }
+    }
+}
+
+void Framebuffer::drawRLE(int16_t x, int16_t y, const uint8_t *data, uint8_t t) {
+    uint32_t ptr = 0;
+    if (data[0] != 'R' || data[1] != 'L' || data[2] != 'E') {
+        return;
+    }
+    ptr = 3;
+    uint8_t depth = data[3];
+    if (depth != 8 && depth != 16) {
+        return;
+    }
+    uint32_t dlen = data[4] << 24 | data[5] << 16 | data[6] << 8 | data[7];
+    uint16_t w = data[8] << 8 | data[9];
+    uint16_t h = data[10] << 8 | data[11];
+    int16_t px = 0;
+    int16_t py = 0;
+
+    uint32_t i = 0;
+    while (i < dlen) {
+        if (data[12+i] != data[13+i]) {
+            if (data[12+i] != t) {
+                setPixel(x + px, y + py, data[12+i]);
+            }
+            i++;
+            px ++;
+            if (px == w) {
+                px = 0;
+                py++;
+            }
+        } else {
+            uint16_t len = 0;
+            uint8_t col = data[12+i];
+            if (depth == 8) {
+                len = data[14+i];
+                i += 3;
+            } else if (depth == 16) {
+                len = data[14+i] << 8 | data[15+i];
+                i += 4;
+            }
+            for (uint32_t j = 0; j < len; j++) {
+                if (col != t) {
+                    setPixel(x + px, y + py, col);
+                }
+                px ++;
+                if (px == w) {
+                    px = 0;
+                    py++;
+                }
+            }
+        }
+    }
+}
+
+void Framebuffer::drawRLETransformed(int16_t x, int16_t y, const uint8_t *data, uint8_t transform) {
+    uint32_t ptr = 0;
+    if (data[0] != 'R' || data[1] != 'L' || data[2] != 'E') {
+        return;
+    }
+    ptr = 3;
+    uint8_t depth = data[3];
+    if (depth != 8 && depth != 16) {
+        return;
+    }
+    uint32_t dlen = data[4] << 24 | data[5] << 16 | data[6] << 8 | data[7];
+    uint16_t w = data[8] << 8 | data[9];
+    uint16_t h = data[10] << 8 | data[11];
+    int16_t px = 0;
+    int16_t py = 0;
+
+    uint32_t i = 0;
+    while (i < dlen) {
+        if (data[12+i] != data[13+i]) {
+            switch (transform) {
+                default:
+                    setPixel(x + px, y + py, data[12+i]);
+                    break;
+                case MirrorH:
+                    setPixel(w - (x + px) - 1, y + py, data[12+i]);
+                    break;
+                case MirrorV:
+                    setPixel(x + px, h - (y + py) - 1, data[12+i]);
+                    break;
+                case Rotate180:
+                    setPixel(w - (x + px) - 1, h - (y + py) - 1, data[12+i]);
+                    break;
+            }
+            i++;
+            px ++;
+            if (px == w) {
+                px = 0;
+                py++;
+            }
+        } else {
+            uint16_t len = 0;
+            uint8_t col = data[12+i];
+            if (depth == 8) {
+                len = data[14+i];
+                i += 3;
+            } else if (depth == 16) {
+                len = data[14+i] << 8 | data[15+i];
+                i += 4;
+            }
+            for (uint32_t j = 0; j < len; j++) {
+                switch (transform) {
+                    default:
+                        setPixel(x + px, y + py, col);
+                        break;
+                    case MirrorH:
+                        setPixel(w - (x + px) - 1, y + py, col);
+                        break;
+                    case MirrorV:
+                        setPixel(x + px, h - (y + py) - 1, col);
+                        break;
+                    case Rotate180:
+                        setPixel(w - (x + px) - 1, h - (y + py) - 1, col);
+                        break;
+                }
+                px ++;
+                if (px == w) {
+                    px = 0;
+                    py++;
+                }
+            }
+        }
+    }
+
+}
+
+void Framebuffer::drawRLETransformed(int16_t x, int16_t y, const uint8_t *data, uint8_t transform, uint8_t t) {
+    uint32_t ptr = 0;
+    if (data[0] != 'R' || data[1] != 'L' || data[2] != 'E') {
+        return;
+    }
+    ptr = 3;
+    uint8_t depth = data[3];
+    if (depth != 8 && depth != 16) {
+        return;
+    }
+    uint32_t dlen = data[4] << 24 | data[5] << 16 | data[6] << 8 | data[7];
+    uint16_t w = data[8] << 8 | data[9];
+    uint16_t h = data[10] << 8 | data[11];
+    int16_t px = 0;
+    int16_t py = 0;
+
+    uint32_t i = 0;
+    while (i < dlen) {
+        if (data[12+i] != data[13+i]) {
+            if (data[12+i] != t) {
+                switch (transform) {
+                    default:
+                        setPixel(x + px, y + py, data[12+i]);
+                        break;
+                    case MirrorH:
+                        setPixel(w - (x + px) - 1, y + py, data[12+i]);
+                        break;
+                    case MirrorV:
+                        setPixel(x + px, h - (y + py) - 1, data[12+i]);
+                        break;
+                    case Rotate180:
+                        setPixel(w - (x + px) - 1, h - (y + py) - 1, data[12+i]);
+                        break;
+                }
+            }
+            i++;
+            px ++;
+            if (px == w) {
+                px = 0;
+                py++;
+            }
+        } else {
+            uint16_t len = 0;
+            uint8_t col = data[12+i];
+            if (depth == 8) {
+                len = data[14+i];
+                i += 3;
+            } else if (depth == 16) {
+                len = data[14+i] << 8 | data[15+i];
+                i += 4;
+            }
+            for (uint32_t j = 0; j < len; j++) {
+                if (col != t) {
+                    switch (transform) {
+                        default:
+                            setPixel(x + px, y + py, col);
+                            break;
+                        case MirrorH:
+                            setPixel(w - (x + px) - 1, y + py, col);
+                            break;
+                        case MirrorV:
+                            setPixel(x + px, h - (y + py) - 1, col);
+                            break;
+                        case Rotate180:
+                            setPixel(w - (x + px) - 1, h - (y + py) - 1, col);
+                            break;
+                    }
+                }
+                px ++;
+                if (px == w) {
+                    px = 0;
+                    py++;
+                }
+            }
+        }
+    }
+
+}
+

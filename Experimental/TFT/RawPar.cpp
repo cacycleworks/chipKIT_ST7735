@@ -55,18 +55,22 @@ void RawPar::setBus(uint32_t value) {
     }
 }
 
-void RawPar::writeCommand(uint8_t command) {
+void RawPar::writeCommand8(uint8_t command) {
     setBus(command);
 }
 
-void RawPar::commandStreamStart() {
+void RawPar::writeCommand16(uint16_t command) {
+    setBus(command);
 }
 
-void RawPar::commandStreamEnd() {
+void RawPar::writeCommand32(uint32_t command) {
+    setBus(command);
 }
 
-void RawPar::commandStream(uint8_t data) {
-    setBus(data);
+void RawPar::streamStart() {
+}
+
+void RawPar::streamEnd() {
 }
 
 void RawPar::writeData8(uint8_t data) {
@@ -81,21 +85,27 @@ void RawPar::writeData32(uint32_t data) {
     setBus(data);
 }
 
-void RawPar::dataStreamStart() {
-}
-
-void RawPar::dataStreamEnd() {
-}
-
-void RawPar::dataStream8(uint8_t data) {
+void RawPar::streamCommand8(uint8_t data) {
     setBus(data);
 }
 
-void RawPar::dataStream16(uint16_t data) {
+void RawPar::streamCommand16(uint16_t data) {
     setBus(data);
 }
 
-void RawPar::dataStream32(uint32_t data) {
+void RawPar::streamCommand32(uint32_t data) {
+    setBus(data);
+}
+
+void RawPar::streamData8(uint8_t data) {
+    setBus(data);
+}
+
+void RawPar::streamData16(uint16_t data) {
+    setBus(data);
+}
+
+void RawPar::streamData32(uint32_t data) {
     setBus(data);
 }
 

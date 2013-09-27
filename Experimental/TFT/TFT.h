@@ -90,6 +90,7 @@ class TFT : public Print
 #include <TFTPar4.h>
 #include <TFTPar8.h>
 #include <RawPar.h>
+#include <TFTPMP.h>
 
 // Virtual display devices
 #include <Framebuffer.h>
@@ -103,7 +104,11 @@ class TFT : public Print
 #include <HD44780.h>
 #include <DOGMe.h>
 #include <ILI9340.h>
+#include <BD663474.h>
 
+// Touchscreen devices
+#include <Touch.h>
+#include <XPT2046.h>
 #endif
 
 

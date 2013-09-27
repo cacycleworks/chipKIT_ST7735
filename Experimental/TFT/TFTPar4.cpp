@@ -58,7 +58,7 @@ void TFTPar4::setBus(uint8_t value) {
     digitalWrite(_d0, value & 0x01);
 }
 
-void TFTPar4::writeCommand(uint8_t command) {
+void TFTPar4::writeCommand8(uint8_t command) {
     digitalWrite(_dc, LOW);
     if(_cs != 255) digitalWrite(_cs, HIGH);
     setBus((command >> 4) & 0x0F);
@@ -68,20 +68,48 @@ void TFTPar4::writeCommand(uint8_t command) {
     if(_cs != 255) digitalWrite(_cs, LOW);
 }
 
-void TFTPar4::commandStreamStart() {
+void TFTPar4::writeCommand16(uint16_t command) {
     digitalWrite(_dc, LOW);
     if(_cs != 255) digitalWrite(_cs, HIGH);
-}
-
-void TFTPar4::commandStreamEnd() {
+    setBus((command >> 12) & 0x0F);
+    clock();
+    setBus((command >> 8) & 0x0F);
+    clock();
+    setBus((command >> 4) & 0x0F);
+    clock();
+    setBus(command & 0x0F);
+    clock();
     if(_cs != 255) digitalWrite(_cs, LOW);
 }
 
-void TFTPar4::commandStream(uint8_t data) {
-    setBus((data >> 4) & 0x0F);
+void TFTPar4::writeCommand32(uint32_t command) {
+    digitalWrite(_dc, LOW);
+    if(_cs != 255) digitalWrite(_cs, HIGH);
+    setBus((command >> 28) & 0x0F);
     clock();
-    setBus(data & 0x0F);
+    setBus((command >> 24) & 0x0F);
     clock();
+    setBus((command >> 20) & 0x0F);
+    clock();
+    setBus((command >> 16) & 0x0F);
+    clock();
+    setBus((command >> 12) & 0x0F);
+    clock();
+    setBus((command >> 8) & 0x0F);
+    clock();
+    setBus((command >> 4) & 0x0F);
+    clock();
+    setBus(command & 0x0F);
+    clock();
+    if(_cs != 255) digitalWrite(_cs, LOW);
+}
+
+void TFTPar4::streamStart() {
+    if(_cs != 255) digitalWrite(_cs, HIGH);
+}
+
+void TFTPar4::streamEnd() {
+    if(_cs != 255) digitalWrite(_cs, LOW);
 }
 
 void TFTPar4::writeData8(uint8_t data) {
@@ -130,23 +158,16 @@ void TFTPar4::writeData32(uint32_t data) {
     if(_cs != 255) digitalWrite(_cs, LOW);
 }
 
-void TFTPar4::dataStreamStart() {
+void TFTPar4::streamCommand8(uint8_t data) {
     digitalWrite(_dc, HIGH);
-    if(_cs != 255) digitalWrite(_cs, HIGH);
-}
-
-void TFTPar4::dataStreamEnd() {
-    if(_cs != 255) digitalWrite(_cs, LOW);
-}
-
-void TFTPar4::dataStream8(uint8_t data) {
     setBus((data >> 4) & 0x0F);
     clock();
     setBus(data & 0x0F);
     clock();
 }
 
-void TFTPar4::dataStream16(uint16_t data) {
+void TFTPar4::streamCommand16(uint16_t data) {
+    digitalWrite(_dc, HIGH);
     setBus((data >> 12) & 0x0F);
     clock();
     setBus((data >> 8) & 0x0F);
@@ -157,7 +178,8 @@ void TFTPar4::dataStream16(uint16_t data) {
     clock();
 }
 
-void TFTPar4::dataStream32(uint32_t data) {
+void TFTPar4::streamCommand32(uint32_t data) {
+    digitalWrite(_dc, HIGH);
     setBus((data >> 28) & 0x0F);
     clock();
     setBus((data >> 24) & 0x0F);
@@ -175,4 +197,45 @@ void TFTPar4::dataStream32(uint32_t data) {
     setBus(data & 0x0F);
     clock();
 }
+
+void TFTPar4::streamData8(uint8_t data) {
+    digitalWrite(_dc, HIGH);
+    setBus((data >> 4) & 0x0F);
+    clock();
+    setBus(data & 0x0F);
+    clock();
+}
+
+void TFTPar4::streamData16(uint16_t data) {
+    digitalWrite(_dc, HIGH);
+    setBus((data >> 12) & 0x0F);
+    clock();
+    setBus((data >> 8) & 0x0F);
+    clock();
+    setBus((data >> 4) & 0x0F);
+    clock();
+    setBus(data & 0x0F);
+    clock();
+}
+
+void TFTPar4::streamData32(uint32_t data) {
+    digitalWrite(_dc, HIGH);
+    setBus((data >> 28) & 0x0F);
+    clock();
+    setBus((data >> 24) & 0x0F);
+    clock();
+    setBus((data >> 20) & 0x0F);
+    clock();
+    setBus((data >> 16) & 0x0F);
+    clock();
+    setBus((data >> 12) & 0x0F);
+    clock();
+    setBus((data >> 8) & 0x0F);
+    clock();
+    setBus((data >> 4) & 0x0F);
+    clock();
+    setBus(data & 0x0F);
+    clock();
+}
+
 

@@ -229,7 +229,7 @@ void ST7735::streamCommands(uint8_t *cmdlist) {
     cmdlist++;
 
     while(numCommands--) {
-        _comm->writeCommand(*cmdlist);
+        _comm->writeCommand8(*cmdlist);
         cmdlist++;
         numArgs  = *cmdlist; 
         cmdlist++; 
@@ -250,19 +250,19 @@ void ST7735::streamCommands(uint8_t *cmdlist) {
 }
 
 void ST7735::setAddrWindow(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1) {
-	_comm->writeCommand(ST7735_CASET); // Column addr set
+	_comm->writeCommand8(ST7735_CASET); // Column addr set
 	_comm->writeData8(0x00);
 	_comm->writeData8(x0+colstart);     // XSTART 
 	_comm->writeData8(0x00);
 	_comm->writeData8(x1+colstart);     // XEND
 
-	_comm->writeCommand(ST7735_RASET); // Row addr set
+	_comm->writeCommand8(ST7735_RASET); // Row addr set
 	_comm->writeData8(0x00);
 	_comm->writeData8(y0+rowstart);     // YSTART
 	_comm->writeData8(0x00);
 	_comm->writeData8(y1+rowstart);     // YEND
 
-	_comm->writeCommand(ST7735_RAMWR); // write to RAM
+	_comm->writeCommand8(ST7735_RAMWR); // write to RAM
 }
 
 void ST7735::setPixel(int16_t x, int16_t y, uint16_t color) {
@@ -289,13 +289,13 @@ void ST7735::fillRectangle(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t 
 	setAddrWindow(x, y, x+w-1, y+h-1);
 	uint8_t hi = color >> 8, lo = color;
 
-    _comm->dataStreamStart();
+    _comm->streamStart();
 	for(y=h; y>0; y--) {
 		for(x=w; x>0; x--) {
-            _comm->dataStream16(color);
+            _comm->streamData16(color);
 		}
 	}
-    _comm->dataStreamEnd();
+    _comm->streamEnd();
 }
 
 void ST7735::drawHorizontalLine(int16_t x, int16_t y, int16_t w, uint16_t color) {
@@ -309,11 +309,11 @@ void ST7735::drawHorizontalLine(int16_t x, int16_t y, int16_t w, uint16_t color)
 		color = swapcolor(color);
 	uint8_t hi = color >> 8, lo = color;
 
-    _comm->dataStreamStart();
+    _comm->streamStart();
 	while (w--) {
-		_comm->dataStream16(color);
+		_comm->streamData16(color);
 	}
-    _comm->dataStreamEnd();
+    _comm->streamEnd();
 }
 
 void ST7735::drawVerticalLine(int16_t x, int16_t y, int16_t h, uint16_t color) {
@@ -326,11 +326,11 @@ void ST7735::drawVerticalLine(int16_t x, int16_t y, int16_t h, uint16_t color) {
 		color = swapcolor(color);
 	uint8_t hi = color >> 8, lo = color;
 
-    _comm->dataStreamStart();
+    _comm->streamStart();
 	while (h--) {
-		_comm->dataStream16(color);
+		_comm->streamData16(color);
 	}
-    _comm->dataStreamEnd();
+    _comm->streamEnd();
 }
 
 #define MADCTL_MY  0x80
@@ -341,7 +341,7 @@ void ST7735::drawVerticalLine(int16_t x, int16_t y, int16_t h, uint16_t color) {
 #define MADCTL_MH  0x04
 
 void ST7735::setRotation(uint8_t m) {
-	_comm->writeCommand(ST7735_MADCTL);
+	_comm->writeCommand8(ST7735_MADCTL);
 	rotation = m % 4; // can't be higher than 3
 	switch (rotation) {
 		case 0:
@@ -368,7 +368,7 @@ void ST7735::setRotation(uint8_t m) {
 }
 
 void ST7735::invertDisplay(boolean i) {
-	_comm->writeCommand(i ? ST7735_INVON : ST7735_INVOFF);
+	_comm->writeCommand8(i ? ST7735_INVON : ST7735_INVOFF);
 }
 
 void ST7735::update(const Framebuffer& fb) {
@@ -376,7 +376,7 @@ void ST7735::update(const Framebuffer& fb) {
     uint32_t pixpair = 0;
     uint16_t color = 0;
 
-    _comm->dataStreamStart();
+    _comm->streamStart();
     for (int y = 0; y < _height; y++) {
         uint8_t l = y & 1;
 
@@ -391,6 +391,6 @@ void ST7735::update(const Framebuffer& fb) {
         }
         _comm->blockData(_linebuffer[l], _width>>1);
     }
-    _comm->dataStreamEnd();
+    _comm->streamEnd();
 }
 

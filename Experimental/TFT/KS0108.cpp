@@ -16,8 +16,8 @@
 #define GLCD_STAT_RESET  0b00010000
 
 void KS0108::initChip(TFTCommunicator *chip) {
-    chip->writeCommand(GLCD_CMD_ON);
-    chip->writeCommand(GLCD_CMD_START);
+    chip->writeCommand8(GLCD_CMD_ON);
+    chip->writeCommand8(GLCD_CMD_START);
 }
 
 void KS0108::initializeDevice() {
@@ -37,12 +37,12 @@ void KS0108::initializeDevice() {
 
 void KS0108::setPage(TFTCommunicator *chip, uint8_t page)
 {
-    chip->writeCommand(GLCD_CMD_SET_PAGE | (page & 0x07));
+    chip->writeCommand8(GLCD_CMD_SET_PAGE | (page & 0x07));
 }
 
 void KS0108::setY(TFTCommunicator *chip, uint8_t y)
 {
-    chip->writeCommand(GLCD_CMD_SET_Y | (y & 63));
+    chip->writeCommand8(GLCD_CMD_SET_Y | (y & 63));
 }
 
 void KS0108::setPixel(int16_t x, int16_t y, uint16_t color) {

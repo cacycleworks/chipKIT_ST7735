@@ -33,6 +33,11 @@ class Framebuffer : public TFT {
         virtual void drawIndexed(int16_t x, int16_t y, const Framebuffer& fb);
         virtual void drawIndexed(int16_t x, int16_t y, const Framebuffer& fb, uint8_t t);
 
+        virtual void drawRLE(int16_t x, int16_t y, const uint8_t *data);
+        virtual void drawRLE(int16_t x, int16_t y, const uint8_t *data, uint8_t t);
+        virtual void drawRLETransformed(int16_t x, int16_t y, const uint8_t *data, uint8_t transform);
+        virtual void drawRLETransformed(int16_t x, int16_t y, const uint8_t *data, uint8_t transform, uint8_t t);
+
         virtual void drawTransformed(int16_t x, int16_t y, const uint8_t *data, uint16_t w, uint16_t h, uint8_t transform);
         virtual void drawTransformed(int16_t x, int16_t y, const uint8_t *data, uint16_t w, uint16_t h, uint8_t transform, uint8_t t);
         virtual void drawTransformed(int16_t x, int16_t y, const Framebuffer& fb, uint8_t transform);
@@ -71,6 +76,10 @@ class Framebuffer : public TFT {
         virtual void displayOn() {};
         virtual void displayOff() {};
         virtual void invertDisplay(boolean i) {};
+
+        virtual uint16_t getWidth() { return _width; };
+        virtual uint16_t getHeight() { return _height; };
+
 
         uint8_t *buffer;
         uint16_t palette[256];

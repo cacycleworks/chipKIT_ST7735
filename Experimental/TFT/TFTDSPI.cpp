@@ -11,59 +11,141 @@ TFTDSPI::TFTDSPI(DSPI *spi, uint8_t cs, uint8_t dc) {
     _dc = dc;
 
     pinMode(_cs, OUTPUT);
-    pinMode(_dc, OUTPUT);
+    if (_dc != 255) pinMode(_dc, OUTPUT);
 
     digitalWrite(_cs, HIGH);
-    digitalWrite(_dc, HIGH);
+    if (_dc != 255) digitalWrite(_dc, HIGH);
 
     _spi->begin();
     _spi->setSpeed(SPI_SPEED);
 }
 
-void TFTDSPI::writeCommand(uint8_t command) {
+uint8_t TFTDSPI::readCommand8() {
+    uint8_t out;
     _spi->setMode(SPI_MODE);
     _spi->setSpeed(SPI_SPEED);
     _spi->setTransferSize(DSPI_8BIT);
-    digitalWrite(_dc, LOW);
+    if (_dc != 255) digitalWrite(_dc, LOW);
+    digitalWrite(_cs, LOW);
+    out = _spi->transfer(0);
+    digitalWrite(_cs, HIGH);
+    return out;
+}
+
+void TFTDSPI::writeCommand8(uint8_t command) {
+    _spi->setMode(SPI_MODE);
+    _spi->setSpeed(SPI_SPEED);
+    _spi->setTransferSize(DSPI_8BIT);
+    if (_dc != 255) digitalWrite(_dc, LOW);
     digitalWrite(_cs, LOW);
     _spi->transfer(command);
     digitalWrite(_cs, HIGH);
 }
 
-void TFTDSPI::commandStreamStart() {
+uint16_t TFTDSPI::readCommand16() {
+    uint16_t out;
+    _spi->setMode(SPI_MODE);
+    _spi->setSpeed(SPI_SPEED);
+    _spi->setTransferSize(DSPI_16BIT);
+    if (_dc != 255) digitalWrite(_dc, LOW);
+    digitalWrite(_cs, LOW);
+    out = _spi->transfer(0);
+    digitalWrite(_cs, HIGH);
+    _spi->setTransferSize(DSPI_8BIT);
+    return out;
+}
+
+void TFTDSPI::writeCommand16(uint16_t command) {
+    _spi->setMode(SPI_MODE);
+    _spi->setSpeed(SPI_SPEED);
+    _spi->setTransferSize(DSPI_16BIT);
+    if (_dc != 255) digitalWrite(_dc, LOW);
+    digitalWrite(_cs, LOW);
+    _spi->transfer(command);
+    digitalWrite(_cs, HIGH);
+    _spi->setTransferSize(DSPI_8BIT);
+}
+
+uint32_t TFTDSPI::readCommand32() {
+    uint32_t out;
+    _spi->setMode(SPI_MODE);
+    _spi->setSpeed(SPI_SPEED);
+    _spi->setTransferSize(DSPI_32BIT);
+    if (_dc != 255) digitalWrite(_dc, LOW);
+    digitalWrite(_cs, LOW);
+    out = _spi->transfer(0);
+    digitalWrite(_cs, HIGH);
+    _spi->setTransferSize(DSPI_8BIT);
+    return out;
+}
+
+void TFTDSPI::writeCommand32(uint32_t command) {
+    _spi->setMode(SPI_MODE);
+    _spi->setSpeed(SPI_SPEED);
+    _spi->setTransferSize(DSPI_32BIT);
+    if (_dc != 255) digitalWrite(_dc, LOW);
+    digitalWrite(_cs, LOW);
+    _spi->transfer(command);
+    digitalWrite(_cs, HIGH);
+    _spi->setTransferSize(DSPI_8BIT);
+}
+
+uint8_t TFTDSPI::readData8() {
+    uint8_t out;
     _spi->setMode(SPI_MODE);
     _spi->setSpeed(SPI_SPEED);
     _spi->setTransferSize(DSPI_8BIT);
-    digitalWrite(_dc, LOW);
+    if (_dc != 255) digitalWrite(_dc, HIGH);
     digitalWrite(_cs, LOW);
-}
-
-void TFTDSPI::commandStreamEnd() {
+    out = _spi->transfer(0);
     digitalWrite(_cs, HIGH);
-}
-
-void TFTDSPI::commandStream(uint8_t data) {
-    _spi->transfer(data);
+    return out;
 }
 
 void TFTDSPI::writeData8(uint8_t data) {
     _spi->setMode(SPI_MODE);
     _spi->setSpeed(SPI_SPEED);
     _spi->setTransferSize(DSPI_8BIT);
-    digitalWrite(_dc, HIGH);
+    if (_dc != 255) digitalWrite(_dc, HIGH);
     digitalWrite(_cs, LOW);
     _spi->transfer(data);
     digitalWrite(_cs, HIGH);
+}
+
+uint16_t TFTDSPI::readData16() {
+    uint16_t out;
+    _spi->setMode(SPI_MODE);
+    _spi->setSpeed(SPI_SPEED);
+    _spi->setTransferSize(DSPI_16BIT);
+    if (_dc != 255) digitalWrite(_dc, HIGH);
+    digitalWrite(_cs, LOW);
+    out = _spi->transfer(0);
+    digitalWrite(_cs, HIGH);
+    _spi->setTransferSize(DSPI_8BIT);
+    return out;
 }
 
 void TFTDSPI::writeData16(uint16_t data) {
     _spi->setMode(SPI_MODE);
     _spi->setSpeed(SPI_SPEED);
     _spi->setTransferSize(DSPI_16BIT);
-    digitalWrite(_dc, HIGH);
+    if (_dc != 255) digitalWrite(_dc, HIGH);
     digitalWrite(_cs, LOW);
     _spi->transfer(data);
     digitalWrite(_cs, HIGH);
+    _spi->setTransferSize(DSPI_8BIT);
+}
+
+uint32_t TFTDSPI::readData32() {
+    uint32_t out;
+    _spi->setMode(SPI_MODE);
+    _spi->setSpeed(SPI_SPEED);
+    _spi->setTransferSize(DSPI_32BIT);
+    if (_dc != 255) digitalWrite(_dc, HIGH);
+    digitalWrite(_cs, LOW);
+    out = _spi->transfer(0);
+    digitalWrite(_cs, HIGH);
+    return out;
     _spi->setTransferSize(DSPI_8BIT);
 }
 
@@ -71,30 +153,42 @@ void TFTDSPI::writeData32(uint32_t data) {
     _spi->setMode(SPI_MODE);
     _spi->setSpeed(SPI_SPEED);
     _spi->setTransferSize(DSPI_32BIT);
-    digitalWrite(_dc, HIGH);
+    if (_dc != 255) digitalWrite(_dc, HIGH);
     digitalWrite(_cs, LOW);
     _spi->transfer(data);
     digitalWrite(_cs, HIGH);
     _spi->setTransferSize(DSPI_8BIT);
 }
 
-void TFTDSPI::dataStreamStart() {
-    digitalWrite(_dc, HIGH);
+void TFTDSPI::streamStart() {
     digitalWrite(_cs, LOW);
 }
 
-void TFTDSPI::dataStreamEnd() {
+void TFTDSPI::streamEnd() {
     digitalWrite(_cs, HIGH);
+    _spi->setTransferSize(DSPI_8BIT);
 }
 
-void TFTDSPI::dataStream8(uint8_t data) {
+void TFTDSPI::streamCommand8(uint8_t data) {
+    if (_dc != 255) digitalWrite(_dc, LOW);
     _spi->setMode(SPI_MODE);
     _spi->setSpeed(SPI_SPEED);
     _spi->setTransferSize(DSPI_8BIT);
     _spi->transfer(data);
 }
 
-void TFTDSPI::dataStream16(uint16_t data) {
+uint8_t TFTDSPI::streamCommand8() {
+    uint8_t out;
+    if (_dc != 255) digitalWrite(_dc, LOW);
+    _spi->setMode(SPI_MODE);
+    _spi->setSpeed(SPI_SPEED);
+    _spi->setTransferSize(DSPI_8BIT);
+    out = _spi->transfer(0);
+    return out;
+}
+
+void TFTDSPI::streamCommand16(uint16_t data) {
+    if (_dc != 255) digitalWrite(_dc, LOW);
     _spi->setMode(SPI_MODE);
     _spi->setSpeed(SPI_SPEED);
     _spi->setTransferSize(DSPI_16BIT);
@@ -102,7 +196,19 @@ void TFTDSPI::dataStream16(uint16_t data) {
     _spi->setTransferSize(DSPI_8BIT);
 }
 
-void TFTDSPI::dataStream32(uint32_t data) {
+uint16_t TFTDSPI::streamCommand16() {
+    uint16_t out;
+    if (_dc != 255) digitalWrite(_dc, LOW);
+    _spi->setMode(SPI_MODE);
+    _spi->setSpeed(SPI_SPEED);
+    _spi->setTransferSize(DSPI_16BIT);
+    out = _spi->transfer(0);
+    _spi->setTransferSize(DSPI_8BIT);
+    return out;
+}
+
+void TFTDSPI::streamCommand32(uint32_t data) {
+    if (_dc != 255) digitalWrite(_dc, LOW);
     _spi->setMode(SPI_MODE);
     _spi->setSpeed(SPI_SPEED);
     _spi->setTransferSize(DSPI_32BIT);
@@ -110,12 +216,81 @@ void TFTDSPI::dataStream32(uint32_t data) {
     _spi->setTransferSize(DSPI_8BIT);
 }
 
+uint32_t TFTDSPI::streamCommand32() {
+    uint32_t out;
+    if (_dc != 255) digitalWrite(_dc, LOW);
+    _spi->setMode(SPI_MODE);
+    _spi->setSpeed(SPI_SPEED);
+    _spi->setTransferSize(DSPI_32BIT);
+    out = _spi->transfer(0);
+    _spi->setTransferSize(DSPI_8BIT);
+    return out;
+}
+
+void TFTDSPI::streamData8(uint8_t data) {
+    if (_dc != 255) digitalWrite(_dc, HIGH);
+    _spi->setMode(SPI_MODE);
+    _spi->setSpeed(SPI_SPEED);
+    _spi->setTransferSize(DSPI_8BIT);
+    _spi->transfer(data);
+}
+
+uint8_t TFTDSPI::streamData8() {
+    uint8_t out;
+    if (_dc != 255) digitalWrite(_dc, HIGH);
+    _spi->setMode(SPI_MODE);
+    _spi->setSpeed(SPI_SPEED);
+    _spi->setTransferSize(DSPI_8BIT);
+    out = _spi->transfer(0);
+    return out;
+}
+
+void TFTDSPI::streamData16(uint16_t data) {
+    if (_dc != 255) digitalWrite(_dc, HIGH);
+    _spi->setMode(SPI_MODE);
+    _spi->setSpeed(SPI_SPEED);
+    _spi->setTransferSize(DSPI_16BIT);
+    _spi->transfer(data);
+    _spi->setTransferSize(DSPI_8BIT);
+}
+
+uint16_t TFTDSPI::streamData16() {
+    uint16_t out;
+    if (_dc != 255) digitalWrite(_dc, HIGH);
+    _spi->setMode(SPI_MODE);
+    _spi->setSpeed(SPI_SPEED);
+    _spi->setTransferSize(DSPI_16BIT);
+    out = _spi->transfer(0);
+    _spi->setTransferSize(DSPI_8BIT);
+    return out;
+}
+
+void TFTDSPI::streamData32(uint32_t data) {
+    if (_dc != 255) digitalWrite(_dc, HIGH);
+    _spi->setMode(SPI_MODE);
+    _spi->setSpeed(SPI_SPEED);
+    _spi->setTransferSize(DSPI_32BIT);
+    _spi->transfer(data);
+    _spi->setTransferSize(DSPI_8BIT);
+}
+
+uint32_t TFTDSPI::streamData32() {
+    uint32_t out;
+    if (_dc != 255) digitalWrite(_dc, HIGH);
+    _spi->setMode(SPI_MODE);
+    _spi->setSpeed(SPI_SPEED);
+    _spi->setTransferSize(DSPI_32BIT);
+    out = _spi->transfer(0);
+    _spi->setTransferSize(DSPI_8BIT);
+    return out;
+}
+
 void TFTDSPI::blockData(uint32_t *data, uint32_t len) {
-    dataStreamStart();
+    streamStart();
     for (uint8_t i = 0; i < len; i++) {
-        dataStream32(data[i]);
+        streamData32(data[i]);
     }
-    dataStreamEnd();
+    streamEnd();
 }
 
 

@@ -4,7 +4,7 @@ void HD44780::initializeDevice() {
 }
 
 void HD44780::command(uint8_t cmd) {
-    _comm->writeCommand(cmd);
+    _comm->writeCommand8(cmd);
     delay(4);
 }
 
