@@ -24,7 +24,7 @@ class BD663474 : public TFT {
 
         void initializeDevice();
 
-        void update(const Framebuffer& fb);
+        void update(Framebuffer *fb);
 
 };
 

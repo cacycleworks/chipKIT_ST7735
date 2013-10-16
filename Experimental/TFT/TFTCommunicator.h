@@ -31,7 +31,10 @@ class TFTCommunicator
         virtual uint16_t streamData16() = 0;
         virtual uint32_t streamData32() = 0;
         virtual uint8_t nativeWidth() = 0;
+        virtual void blockData(uint8_t *data, uint32_t len) = 0;
+        virtual void blockData(uint16_t *data, uint32_t len) = 0;
         virtual void blockData(uint32_t *data, uint32_t len) = 0;
+        virtual void initializeDevice() = 0;
 };
 
 #endif

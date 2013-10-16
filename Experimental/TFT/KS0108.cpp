@@ -15,37 +15,30 @@
 #define GLCD_STAT_ONOFF  0b00100000
 #define GLCD_STAT_RESET  0b00010000
 
-void KS0108::initChip(TFTCommunicator *chip) {
-    chip->writeCommand8(GLCD_CMD_ON);
-    chip->writeCommand8(GLCD_CMD_START);
-}
-
 void KS0108::initializeDevice() {
     _width  = 64;
     _height = 64;
-    initChip(_chip1);
-    if (_chip2) {
-        _width = 128;
-        initChip(_chip2);
-    }
-    if (_chip3) {
-        _width = 192;
-        initChip(_chip3);
-    }
-    buffer = (uint8_t *)malloc(_width * _height / 8);
+    _comm->initializeDevice();
+    _comm->writeCommand8(GLCD_CMD_ON);
+    _comm->writeCommand8(GLCD_CMD_START);
 }
 
-void KS0108::setPage(TFTCommunicator *chip, uint8_t page)
+void KS0108::setPage(uint8_t page)
 {
-    chip->writeCommand8(GLCD_CMD_SET_PAGE | (page & 0x07));
+    _comm->writeCommand8(GLCD_CMD_SET_PAGE | (page & 0x07));
 }
 
-void KS0108::setY(TFTCommunicator *chip, uint8_t y)
+void KS0108::setY(uint8_t y)
 {
-    chip->writeCommand8(GLCD_CMD_SET_Y | (y & 63));
+    _comm->writeCommand8(GLCD_CMD_SET_Y | (y & 63));
 }
 
 void KS0108::setPixel(int16_t x, int16_t y, uint16_t color) {
+    doSetPixel(x, y, color);
+    updateScreen();
+}
+
+void KS0108::doSetPixel(int16_t x, int16_t y, uint16_t color) {
     uint8_t row;
     uint8_t pixel;
     uint8_t mask;
@@ -69,6 +62,7 @@ void KS0108::fillScreen(uint16_t color) {
             this->buffer[y * _width + x] = color ? 0xFF : 0x00;
         }
     }
+    updateScreen();
 }
 
 void KS0108::fillRectangle(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color) {
@@ -84,14 +78,17 @@ void KS0108::fillRectangle(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t 
             setPixel(dx, dy, color);
         }
     }
+    updateScreen();
 }
 
 void KS0108::drawHorizontalLine(int16_t x, int16_t y, int16_t w, uint16_t color) {
     drawLine(x, y, x + w, y, color);
+    updateScreen();
 }
 
 void KS0108::drawVerticalLine(int16_t x, int16_t y, int16_t h, uint16_t color) {
     drawLine(x, y, x, y + h, color);
+    updateScreen();
 }
 
 void KS0108::invertDisplay(boolean i) {
@@ -100,31 +97,18 @@ void KS0108::invertDisplay(boolean i) {
             this->buffer[y * _width + x] = ~this->buffer[y * _width + x];
         }
     }
+    updateScreen();
 }
 
-void KS0108::update() {
+void KS0108::updateScreen() {
     uint8_t x,y;
     for(y=0; y<8; y++)
     {
-        this->setPage(_chip1, y);
-        this->setY(_chip1, 0);
-        if (_chip2) {
-            this->setPage(_chip2, y);
-            this->setY(_chip2, 0);
-        }
-        if (_chip3) {
-            this->setPage(_chip3, y);
-            this->setY(_chip3, 0);
-        }
+        this->setPage(y);
+        this->setY(0);
         for(x=0; x<64; x++)
         {
-            _chip1->writeData8(this->buffer[y * _width + x]);
-            if (_chip2) {
-                _chip2->writeData8(this->buffer[y * _width + x + 64]);
-            }
-            if (_chip3) {
-                _chip3->writeData8(this->buffer[y * _width + x + 128]);
-            }
+            _comm->writeData8(this->buffer[y * _width + x]);
         }
     }
 }

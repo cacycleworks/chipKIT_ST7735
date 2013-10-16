@@ -8,10 +8,13 @@
 # include <WProgram.h>
 #endif
 
+#define RGB(r,g,b) ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3)
+
 #include <algorithm>
 
 // Base classes
 #include <TFTCommunicator.h>
+#include <DataStore.h>
 #include <Color.h>
 #include <Fonts.h>
 
@@ -40,8 +43,6 @@ class TFT : public Print
         uint16_t getTextColor();
         void invertTextColor();
         void setTextWrap(boolean w);
-        int16_t width(void);
-        int16_t height(void);
         uint16_t color565(uint8_t r, uint8_t g, uint8_t b);
 
         void fillScreen(uint16_t color);
@@ -54,8 +55,9 @@ class TFT : public Print
         virtual void displayOn() = 0;
         virtual void displayOff() = 0;
         virtual void invertDisplay(boolean i) = 0;
-        virtual void update(const Framebuffer& fb);
-        virtual void update(const Framebuffer& fb, int16_t dx, int16_t dy);
+        virtual void update(Framebuffer *fb);
+        virtual void update(Framebuffer *fb, int16_t dx, int16_t dy);
+        virtual uint16_t stringWidth(char *text);
 #if ARDUINO >= 100
         size_t write(uint8_t c);
 #else
@@ -70,6 +72,10 @@ class TFT : public Print
         int16_t _height;
         uint8_t rotation;
         uint8_t drawChar(int16_t x, int16_t y, unsigned char c, uint16_t color, uint16_t bg);
+
+        virtual uint16_t getWidth() { return _width; };
+        virtual uint16_t getHeight() { return _height; };
+
 
     private:
         void drawCircleHelper( int16_t x0, int16_t y0, int16_t r, uint8_t cornername, uint16_t color);
@@ -91,6 +97,11 @@ class TFT : public Print
 #include <TFTPar8.h>
 #include <RawPar.h>
 #include <TFTPMP.h>
+#include <MCP23S17.h>
+
+// Storage devices
+#include <SPIRAM.h>
+#include <SRAM.h>
 
 // Virtual display devices
 #include <Framebuffer.h>
@@ -105,6 +116,7 @@ class TFT : public Print
 #include <DOGMe.h>
 #include <ILI9340.h>
 #include <BD663474.h>
+#include <SSD1289.h>
 
 // Touchscreen devices
 #include <Touch.h>

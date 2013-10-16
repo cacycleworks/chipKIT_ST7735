@@ -80,6 +80,16 @@ class Fonts {
         static const uint8_t ArialBold36[];
         static const uint8_t ArialBold38[];
         static const uint8_t ArialBold40[];
+
+	static const uint8_t OCR_A8[];
+	static const uint8_t OCR_A10[];
+	static const uint8_t OCR_A12[];
+	static const uint8_t OCR_A14[];
+	static const uint8_t OCR_A16[];
+	static const uint8_t OCR_A18[];
+	static const uint8_t OCR_A20[];
+	static const uint8_t OCR_A22[];
+	static const uint8_t OCR_A24[];
 };
 
 #endif

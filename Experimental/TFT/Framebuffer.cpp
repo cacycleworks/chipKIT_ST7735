@@ -1,8 +1,7 @@
 #include <TFT.h>
 
 Framebuffer::Framebuffer() {
-    _width = 0;
-    _height = 0;
+    _width = _height = _masterWidth = _masterHeight = 0;
     sprites = NULL;
     buffer = NULL;
     setColor(0, Color::Black);
@@ -23,12 +22,13 @@ Framebuffer::Framebuffer() {
     setColor(15, Color::White);
 }
 
-Framebuffer::Framebuffer(int16_t w, int16_t h, uint8_t *b) {
+Framebuffer::Framebuffer(int16_t w, int16_t h, DataStore *b) {
     _width = w;
     _height = h;
+    _masterWidth = w;
+    _masterHeight = h;
     sprites = NULL;
     buffer = b;
-    memset(buffer, 0, w * h);
     setColor(0, Color::Black);
     setColor(1, Color::DarkBlue);
     setColor(2, Color::DarkRed);
@@ -47,18 +47,47 @@ Framebuffer::Framebuffer(int16_t w, int16_t h, uint8_t *b) {
     setColor(15, Color::White);
 }
 
+void Framebuffer::initializeDevice() {
+    sprites = NULL;
+	buffer->initializeDevice();
+}
+
+void Framebuffer::translateCoordinates(int16_t *x, int16_t *y) {
+    int16_t t;
+    switch (rotation) {
+        case 1:
+            t = *x;
+            *x = _width - *y;
+            *y = t;
+            break;
+        case 2:
+            *x = _width - *x;
+            *y = _height - *y;
+            break;
+        case 3:
+            t = *x;
+            *x = *y;
+            *y = _height - t;
+            break;
+    }
+}
+
 void Framebuffer::setPixel(int16_t x, int16_t y, uint16_t color) {
+    translateCoordinates(&x, &y);
+
     if (x < 0 || x >= _width || y < 0 || y >= _height) {
         return;
     }
+    
     uint8_t pcol = color & 0xFF;
     uint32_t pos = y * _width + x;
-    buffer[pos] = pcol;
+    bufferWrite(pos, pcol);
 }
 
 void Framebuffer::fillScreen(uint16_t color) {
-    memset(buffer, (color & 0xFF), _width * _height);
+    buffer->setAll8(color);
 }
+
 void Framebuffer::drawVerticalLine(int16_t x, int16_t y, int16_t h, uint16_t color) {
     drawLine(x, y, x, y+h-1, color);
 }
@@ -93,8 +122,8 @@ void Framebuffer::loadPalette(const uint8_t p[256][3]) {
     }
 }
 
-void Framebuffer::loadPalette(const Framebuffer& fb) {
-    memcpy(palette, fb.palette, 256);
+void Framebuffer::loadPalette(Framebuffer *fb) {
+    memcpy(palette, fb->palette, 256);
 }
 
 void Framebuffer::drawIndexed(int16_t x, int16_t y, const uint8_t *data, uint16_t w, uint16_t h) {
@@ -167,81 +196,81 @@ void Framebuffer::drawTransformed(int16_t x, int16_t y, const uint8_t *data, uin
     }
 }
 
-void Framebuffer::drawIndexed(int16_t x, int16_t y, const Framebuffer& fb) {
+void Framebuffer::drawIndexed(int16_t x, int16_t y, Framebuffer *fb) {
     uint32_t pos;
-    uint16_t w = fb._width;
-    uint16_t h = fb._height;
+    uint16_t w = fb->_width;
+    uint16_t h = fb->_height;
 
     for (int j = 0; j < h; j++) {
         for (int i = 0; i < w; i++) {
             pos = j * w + i;
-            setPixel(x + i, y + j, fb.buffer[pos]);
+            setPixel(x + i, y + j, fb->bufferRead(pos));
         }
     }
 }
 
-void Framebuffer::drawIndexed(int16_t x, int16_t y, const Framebuffer& fb, uint8_t t) {
+void Framebuffer::drawIndexed(int16_t x, int16_t y, Framebuffer *fb, uint8_t t) {
     uint32_t pos;
-    uint16_t w = fb._width;
-    uint16_t h = fb._height;
+    uint16_t w = fb->_width;
+    uint16_t h = fb->_height;
 
     for (int j = 0; j < h; j++) {
         for (int i = 0; i < w; i++) {
             pos = j * w + i;
-            if (fb.buffer[pos] != t) {
-                setPixel(x + i, y + j, fb.buffer[pos]);
+            if (fb->bufferRead(pos) != t) {
+                setPixel(x + i, y + j, fb->bufferRead(pos));
             }
         }
     }
 }
 
-void Framebuffer::drawTransformed(int16_t x, int16_t y, const Framebuffer& fb, uint8_t transform) {
+void Framebuffer::drawTransformed(int16_t x, int16_t y, Framebuffer *fb, uint8_t transform) {
     uint32_t pos;
-    uint16_t w = fb._width;
-    uint16_t h = fb._height;
+    uint16_t w = fb->_width;
+    uint16_t h = fb->_height;
 
     for (int j = 0; j < h; j++) {
         for (int i = 0; i < w; i++) {
             pos = j * w + i;
             switch (transform) {
                 default:
-                    setPixel(x + i, y + j, fb.buffer[pos]);
+                    setPixel(x + i, y + j, fb->bufferRead(pos));
                     break;
                 case MirrorH:
-                    setPixel(w - (x + i) - 1, y + j, fb.buffer[pos]);
+                    setPixel(w - (x + i) - 1, y + j, fb->bufferRead(pos));
                     break;
                 case MirrorV:
-                    setPixel(x + i, h - (y + j) - 1, fb.buffer[pos]);
+                    setPixel(x + i, h - (y + j) - 1, fb->bufferRead(pos));
                     break;
                 case Rotate180:
-                    setPixel(w - (x + i) - 1, h - (y + j) - 1, fb.buffer[pos]);
+                    setPixel(w - (x + i) - 1, h - (y + j) - 1, fb->bufferRead(pos));
                     break;
             }
         }
     }
 }
 
-void Framebuffer::drawTransformed(int16_t x, int16_t y, const Framebuffer& fb, uint8_t transform, uint8_t t) {
+void Framebuffer::drawTransformed(int16_t x, int16_t y, Framebuffer *fb, uint8_t transform, uint8_t t) {
     uint32_t pos;
-    uint16_t w = fb._width;
-    uint16_t h = fb._height;
+    uint16_t w = fb->_width;
+    uint16_t h = fb->_height;
 
     for (int j = 0; j < h; j++) {
         for (int i = 0; i < w; i++) {
             pos = j * w + i;
-            if (fb.buffer[pos] != t) {
+            if (fb->bufferRead(pos) != t) {
                 switch (transform) {
                     default:
-                        setPixel(x + i, y + j, fb.buffer[pos]);
+                        setPixel(x + i, y + j, fb->bufferRead(pos));
                         break;
                     case MirrorH:
-                        setPixel(w - (x + i) - 1, y + j, fb.buffer[pos]);
+                        setPixel(w - (x + i) - 1, y + j, fb->bufferRead(pos));
                         break;
                     case MirrorV:
-                        setPixel(x + i, h - (y + j) - 1, fb.buffer[pos]);
+                        setPixel(x + i, h - (y + j) - 1, fb->bufferRead(pos));
                         break;
                     case Rotate180:
-                        setPixel(w - (x + i) - 1, h - (y + j) - 1, fb.buffer[pos]);
+                        setPixel(w - (x + i) - 1, h - (y + j) - 1, fb->bufferRead(pos));
                         break;
                 }
             }
@@ -297,7 +326,7 @@ void Framebuffer::removeSprite(struct sprite *s) {
     }
 }
 
-struct sprite *Framebuffer::spriteAt(int16_t x, int16_t y) const {
+struct sprite *Framebuffer::spriteAt(int16_t x, int16_t y) {
     struct sprite *scan;
     if (sprites == NULL) {
         return NULL;
@@ -314,7 +343,7 @@ struct sprite *Framebuffer::spriteAt(int16_t x, int16_t y) const {
     return NULL;
 }
 
-uint16_t Framebuffer::colorAt(int16_t x, int16_t y) const {
+uint16_t Framebuffer::colorAt(int16_t x, int16_t y) {
     if (x < 0 || y < 0 || x >= _width || y >= _height) {
         return 0;
     }
@@ -325,7 +354,26 @@ uint16_t Framebuffer::colorAt(int16_t x, int16_t y) const {
         return palette[color];
     }
     uint32_t pos = y * _width + x;
-    return palette[buffer[pos]];
+    return palette[bufferRead(pos)];
+}
+
+void Framebuffer::getScanLine(uint16_t y, uint16_t *data) {
+	uint8_t bufferdata[_masterWidth];
+	buffer->read8(y * _masterWidth, bufferdata, _masterWidth);
+	for (uint16_t x = 0; x < _masterWidth; x++) {
+        if (sprites != NULL) {
+            struct sprite *s = spriteAt(x, y);
+            if (s) {
+                uint32_t offset = s->width * s->height * s->currentframe;
+                uint8_t color = s->data[offset + (y - s->ypos) * s->width + (x - s->xpos)];
+                data[x] = palette[color];
+            } else {
+                data[x] = palette[bufferdata[x]];
+            }
+        } else {
+            data[x] = palette[bufferdata[x]];
+        }
+	}
 }
 
 void Framebuffer::animate(struct sprite *s) {
@@ -403,6 +451,7 @@ void Framebuffer::setSprite(struct sprite *s, uint8_t n, int8_t v) {
 void Framebuffer::copyRect(int16_t dx, int16_t dy, int16_t sx, int16_t sy, uint16_t w, uint16_t h) {
     uint32_t dpos;
     uint32_t spos;
+    translateCoordinates(&dx, &dy);
     for (int y = 0; y < w; y++) {
         for (int x = 0; x < h; x++) {
             if (sx > dx && sy > dy) {
@@ -418,7 +467,7 @@ void Framebuffer::copyRect(int16_t dx, int16_t dy, int16_t sx, int16_t sy, uint1
                 dpos = ((h - y) + dy) * _width + ((w - x) + dx);
                 spos = ((h - y) + sy) * _width + ((w - x) + sx);
             }
-            buffer[dpos] = buffer[spos];
+            bufferWrite(dpos, bufferRead(spos));
         }
     }
 }
@@ -674,6 +723,32 @@ void Framebuffer::drawRLETransformed(int16_t x, int16_t y, const uint8_t *data, 
             }
         }
     }
-
 }
+
+uint8_t Framebuffer::bufferRead(uint32_t addr) {
+    return buffer->read8(addr);
+}
+
+void Framebuffer::bufferWrite(uint32_t addr, uint8_t value) {
+    buffer->write8(addr, value);
+}
+
+void Framebuffer::setRotation(uint8_t rot) {
+    rotation = rot % 4;
+}
+
+uint16_t Framebuffer::getWidth() {
+    if (rotation == 0 || rotation == 2) {
+        return _width;
+    }
+    return _height;
+}
+
+uint16_t Framebuffer::getHeight() {
+    if (rotation == 0 || rotation == 2) {
+        return _height;
+    }
+    return _width;
+}
+
 

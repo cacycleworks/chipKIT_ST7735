@@ -1,6 +1,7 @@
 #include <TFT.h>
 
 void HD44780::initializeDevice() {
+    _comm->initializeDevice();
 }
 
 void HD44780::command(uint8_t cmd) {

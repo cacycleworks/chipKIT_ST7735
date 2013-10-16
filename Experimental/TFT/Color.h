@@ -5,10 +5,6 @@
 #ifndef _COLOR_H
 #define _COLOR_H
 
-
-#define RGB(r,g,b) ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3)
-
-
 class Color {
     public: 
         const static uint16_t Snow                  = RGB(255,250,250);

@@ -73,6 +73,7 @@ inline uint16_t swapcolor(uint16_t x) {
 }
 
 void ILI9340::initializeDevice() {
+    _comm->initializeDevice();
     _width  = ILI9340::Width;
     _height = ILI9340::Height;
     _comm->writeCommand8(0xEF);
@@ -292,21 +293,13 @@ void ILI9340::invertDisplay(boolean i) {
 	_comm->writeCommand8(i ? ILI9340_INVON : ILI9340_INVOFF);
 }
 
-void ILI9340::update(const Framebuffer& fb) {
+void ILI9340::update(Framebuffer *fb) {
     setAddrWindow(0, 0, _width, _height);
-    uint32_t pixpair = 0;
-    uint16_t color = 0;
+    uint16_t linebuffer[_width];
 
-    _comm->streamStart();
     for (int y = 0; y < _height; y++) {
-        for (int x = 0; x < _width; x+=2) {
-            color = fb.colorAt(x, y);
-            pixpair = color << 16;
-            color = fb.colorAt(x+1, y);
-            pixpair |= color;
-            _comm->streamData32(pixpair);
-        }
+	fb->getScanLine(y, linebuffer);
+	_comm->blockData(linebuffer, _width);
     }
-    _comm->streamEnd();
 }
 

@@ -10,7 +10,7 @@
 
 class Touch {
     public:
-        Touch(TFTCommunicator *comm) : _comm(comm) {}
+        Touch(TFTCommunicator *comm, uint16_t w, uint16_t h) : _comm(comm), _width(w), _height(h) {}
         virtual void initializeDevice() = 0;
         virtual uint16_t x() = 0;
         virtual uint16_t y() = 0;
@@ -18,6 +18,8 @@ class Touch {
 
     protected:
         TFTCommunicator *_comm;
+        uint16_t _width;
+        uint16_t _height;
 };
 
 #endif

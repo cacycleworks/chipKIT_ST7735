@@ -10,7 +10,7 @@ struct coord {
 
 class XPT2046 : public Touch {
     public: 
-        XPT2046(TFTCommunicator *comm) : Touch(comm) {}
+        XPT2046(TFTCommunicator *comm, uint16_t w, uint16_t h) : Touch(comm, w, h) {}
 
         void sample();
         uint16_t x();

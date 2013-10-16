@@ -194,6 +194,7 @@ inline uint16_t swapcolor(uint16_t x) {
 }
 
 void ST7735::initializeDevice() {
+    _comm->initializeDevice();
     colstart = rowstart = 0;
     _width  = ST7735::Width;
     _height = ST7735::Height;
@@ -371,7 +372,7 @@ void ST7735::invertDisplay(boolean i) {
 	_comm->writeCommand8(i ? ST7735_INVON : ST7735_INVOFF);
 }
 
-void ST7735::update(const Framebuffer& fb) {
+void ST7735::update(Framebuffer *fb) {
     setAddrWindow(0, 0, _width, _height);
     uint32_t pixpair = 0;
     uint16_t color = 0;
@@ -381,10 +382,10 @@ void ST7735::update(const Framebuffer& fb) {
         uint8_t l = y & 1;
 
         for (int x = 0; x < _width; x+=2) {
-            color = fb.colorAt(x, y);
+            color = fb->colorAt(x, y);
             if (_variant == ST7735::BlackTab) color = swapcolor(color);
             pixpair = color << 16;
-            color = fb.colorAt(x+1, y);
+            color = fb->colorAt(x+1, y);
             if (_variant == ST7735::BlackTab) color = swapcolor(color);
             pixpair |= color;
             _linebuffer[l][x >> 1] = pixpair;

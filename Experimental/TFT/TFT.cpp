@@ -328,6 +328,27 @@ void TFT::drawRGBA(int16_t x, int16_t y, const uint16_t *bitmap, int16_t w, int1
     }
 }
 
+uint16_t TFT::stringWidth(char *text) {
+    uint16_t w = 0;
+
+    uint8_t lpc = font[0];
+    uint8_t bpl = font[1];
+    uint8_t startGlyph = font[2]; // First character in data
+    uint8_t endGlyph = font[3]; // Last character in data
+
+    for (char *t = text; *t; t++) {
+        char c = *t;
+        if (c >= startGlyph && c <= endGlyph) {
+            uint8_t co = c - startGlyph;
+            uint16_t charstart = (co * ((lpc * bpl) + 1)) + 4; // Start of character data
+            uint8_t charwidth = font[charstart++];
+            w += charwidth;
+        }
+    }
+    return w;
+}
+        
+
 #if ARDUINO >= 100
 size_t TFT::write(uint8_t c) {
 #else
@@ -426,15 +447,6 @@ void TFT::setTextWrap(boolean w) {
   wrap = w;
 }
 
-// return the size of the display which depends on the rotation!
-int16_t TFT::width(void) { 
-  return _width; 
-}
- 
-int16_t TFT::height(void) { 
-  return _height; 
-}
-
 uint16_t TFT::color565(uint8_t r, uint8_t g, uint8_t b) {
     return ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3);
 }
@@ -443,14 +455,14 @@ void TFT::setFont(const uint8_t *f) {
     font = f;
 }
 
-void TFT::update(const Framebuffer& fb) {
+void TFT::update(Framebuffer *fb) {
     update(fb, 0, 0);
 }
 
-void TFT::update(const Framebuffer& fb, int16_t dx, int16_t dy) {
+void TFT::update(Framebuffer *fb, int16_t dx, int16_t dy) {
     for (int y = 0; y < _height; y++) {
         for (int x = 0; x < _width; x++) {
-            setPixel(x, y, fb.colorAt(x + dx, y + dy));
+            setPixel(x, y, fb->colorAt(x + dx, y + dy));
         }
     }
 }

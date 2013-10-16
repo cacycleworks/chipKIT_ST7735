@@ -10,6 +10,7 @@ inline uint16_t swapcolor(uint16_t x) {
 }
 
 void BD663474::initializeDevice() {
+    _comm->initializeDevice();
     _width  = BD663474::Width;
     _height = BD663474::Height;
 
@@ -254,7 +255,7 @@ void BD663474::invertDisplay(boolean i) {
 //	_comm->writeCommand(i ? BD663474_INVON : BD663474_INVOFF);
 }
 
-void BD663474::update(const Framebuffer& fb) {
+void BD663474::update(Framebuffer *fb) {
     uint32_t pixpair = 0;
     uint16_t color = 0;
 
@@ -262,9 +263,9 @@ void BD663474::update(const Framebuffer& fb) {
     setAddrWindow(0, 0, _width, _height);
     for (int y = 0; y < _height; y++) {
         for (int x = 0; x < _width; x+=2) {
-            color = fb.colorAt(x, y);
+            color = fb->colorAt(x, y);
             pixpair = color << 16;
-            color = fb.colorAt(x+1, y);
+            color = fb->colorAt(x+1, y);
             pixpair |= color;
             _comm->streamData32(pixpair);
         }

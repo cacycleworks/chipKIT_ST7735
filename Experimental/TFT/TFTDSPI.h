@@ -7,7 +7,9 @@
 class TFTDSPI : public TFTCommunicator 
 {
     public:
-        TFTDSPI(DSPI *spi, uint8_t cs, uint8_t dc = 255);
+        TFTDSPI(DSPI *spi, uint8_t cs, uint8_t dc = 255, uint32_t sp=40000000UL) : _spi(spi), _cs(cs), _dc(dc), _speed(sp) {}
+
+        void initializeDevice();
         uint8_t readCommand8();
         uint16_t readCommand16();
         uint32_t readCommand32();
@@ -35,12 +37,15 @@ class TFTDSPI : public TFTCommunicator
         uint16_t streamData16();
         uint32_t streamData32();
         uint8_t nativeWidth() { return 32; };
+        void blockData(uint8_t *data, uint32_t len);
+        void blockData(uint16_t *data, uint32_t len);
         void blockData(uint32_t *data, uint32_t len);
 
     private:
         DSPI *_spi;
         uint8_t _cs;
         uint8_t _dc;
+        uint32_t _speed;
 };
 
 #endif

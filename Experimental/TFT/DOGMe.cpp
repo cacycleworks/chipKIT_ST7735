@@ -8,6 +8,7 @@
   lcd.command(0x38);      // function set
 */
 void DOGMe::initializeDevice() {
+    _comm->initializeDevice();
     _table = 0;
 
 //    setBits(_bits);

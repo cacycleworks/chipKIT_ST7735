@@ -33,7 +33,7 @@ class ST7735 : public TFT {
 
         void initializeDevice();
 
-        void update(const Framebuffer& fb);
+        void update(Framebuffer *fb);
 
 	protected:
 		void streamCommands(uint8_t *cmdlist);
