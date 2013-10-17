@@ -1,0 +1,5 @@
+This experimental section has been moved to its own separate repository
+as it has outgrown the sense and meaning of the current repository.
+
+https://github.com/majenkotech/chipKIT-TFT
+
